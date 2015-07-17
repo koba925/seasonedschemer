@@ -6,14 +6,13 @@
 (define two-in-a-row?
   (lambda (lat)
     (cond ((null? lat) #f)
-          ((is-first? (car lat) (cdr lat)) #t)
-          (else (two-in-a-row? (cdr lat))))))
+          (else (or (is-first? (car lat) (cdr lat))
+                    (two-in-a-row? (cdr lat)))))))
 
 (define is-first?
   (lambda (a lat)
     (cond ((null? lat) #f)
-          ((eq? (car lat) a) #t)
-          (else #f))))
+          (else (eq? (car lat) a)))))
 
 (check-false (two-in-a-row? '()))
 (check-false (two-in-a-row? '(a)))
