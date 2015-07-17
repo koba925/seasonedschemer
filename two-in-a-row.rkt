@@ -12,7 +12,7 @@
   (lambda (a lat)
     (cond ((null? lat) #f)
           (else (or (eq? (car lat) a)
-                    (two-in-a-row? lat))))))
+                    (is-first-b? (car lat) (cdr lat)))))))
 
 (check-false (two-in-a-row? '()))
 (check-false (two-in-a-row? '(a)))
