@@ -21,3 +21,19 @@
 (check-true (two-in-a-row? '(a b b)))
 (check-false (two-in-a-row? '(a b c)))
 
+(define sum-of-prefixes
+  (lambda (tup)
+    (cond ((null? tup) (quote ()))
+          (else (sum-of-prefixes-b 0 tup)))))
+
+;+はあることにする
+(define sum-of-prefixes-b
+  (lambda (sonssf tup)
+    (cond ((null? tup) (quote ()))
+          (else (cons (+ sonssf (car tup))
+                      (sum-of-prefixes-b (+ sonssf (car tup))
+                                         (cdr tup)))))))
+
+(check-equal? (sum-of-prefixes '()) '())
+(check-equal? (sum-of-prefixes '(1)) '(1))
+(check-equal? (sum-of-prefixes '(1 2 3)) '(1 3 6))
