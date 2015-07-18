@@ -23,3 +23,16 @@
 
 (check-equal? (sub1 2) 1)
 
+(define one?
+  (lambda (n) (zero? (sub1 n))))
+
+(check-true (zero? 0))
+(check-false (zero? 1))
+
+(define pick
+  (lambda (n lat)
+    (cond ((one? n) (car lat))
+          (else (pick (sub1 n) (cdr lat))))))
+
+(check-equal? (pick 1 '(2)) 2)
+(check-equal? (pick 2 '(1 2 3)) 2)
