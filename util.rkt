@@ -2,7 +2,7 @@
 
 (require rackunit)
 
-(provide atom? add1 sub1)
+(provide atom? add1 sub1 one? pick)
 
 (define atom?
   (lambda (x)
