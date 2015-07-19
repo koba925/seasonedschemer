@@ -37,3 +37,18 @@
 (check-equal? (sum-of-prefixes '()) '())
 (check-equal? (sum-of-prefixes '(1)) '(1))
 (check-equal? (sum-of-prefixes '(1 2 3)) '(1 3 6))
+
+(define scramble
+  (lambda (tup)
+    (scramble-b (quote ()) tup)))
+
+(define scramble-b
+  (lambda (prefix tup)
+    (cond ((null? tup) (quote ()))
+          (else (cons (pick (car tup) (cons (car tup) prefix))
+                      (scramble-b (cons (car tup) prefix)
+                                  (cdr tup)))))))
+
+(check-equal? (scramble '()) '())
+(check-equal? (scramble '(1)) '(1))
+(check-equal? (scramble '(1 1 1 3 4 2 1 1 9 2)) '(1 1 1 1 1 4 1 1 1 9))
