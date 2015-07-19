@@ -40,14 +40,14 @@
 
 (define scramble
   (lambda (tup)
-    (scramble-b (quote ()) tup)))
+    (scramble-b tup (quote ()))))
 
 (define scramble-b
-  (lambda (prefix tup)
+  (lambda (tup rev-pre)
     (cond ((null? tup) (quote ()))
-          (else (cons (pick (car tup) (cons (car tup) prefix))
-                      (scramble-b (cons (car tup) prefix)
-                                  (cdr tup)))))))
+          (else (cons (pick (car tup) (cons (car tup) rev-pre))
+                      (scramble-b (cdr tup)
+                                  (cons (car tup) rev-pre)))))))
 
 (check-equal? (scramble '()) '())
 (check-equal? (scramble '(1)) '(1))
