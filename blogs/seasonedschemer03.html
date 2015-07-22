@@ -1,0 +1,565 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer03</title>
+<style type="text/css">
+body {
+  font-family: Helvetica, arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: white;
+  padding: 30px; }
+
+body > *:first-child {
+  margin-top: 0 !important; }
+body > *:last-child {
+  margin-bottom: 0 !important; }
+
+a {
+  color: #4183C4; }
+a.absent {
+  color: #cc0000; }
+a.anchor {
+  display: block;
+  padding-left: 30px;
+  margin-left: -30px;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0; }
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 20px 0 10px;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+  cursor: text;
+  position: relative; }
+
+h1:hover a.anchor, h2:hover a.anchor, h3:hover a.anchor, h4:hover a.anchor, h5:hover a.anchor, h6:hover a.anchor {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA09pVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoMTMuMCAyMDEyMDMwNS5tLjQxNSAyMDEyLzAzLzA1OjIxOjAwOjAwKSAgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OUM2NjlDQjI4ODBGMTFFMTg1ODlEODNERDJBRjUwQTQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OUM2NjlDQjM4ODBGMTFFMTg1ODlEODNERDJBRjUwQTQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo5QzY2OUNCMDg4MEYxMUUxODU4OUQ4M0REMkFGNTBBNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo5QzY2OUNCMTg4MEYxMUUxODU4OUQ4M0REMkFGNTBBNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PsQhXeAAAABfSURBVHjaYvz//z8DJYCRUgMYQAbAMBQIAvEqkBQWXI6sHqwHiwG70TTBxGaiWwjCTGgOUgJiF1J8wMRAIUA34B4Q76HUBelAfJYSA0CuMIEaRP8wGIkGMA54bgQIMACAmkXJi0hKJQAAAABJRU5ErkJggg==) no-repeat 10px center;
+  text-decoration: none; }
+
+h1 tt, h1 code {
+  font-size: inherit; }
+
+h2 tt, h2 code {
+  font-size: inherit; }
+
+h3 tt, h3 code {
+  font-size: inherit; }
+
+h4 tt, h4 code {
+  font-size: inherit; }
+
+h5 tt, h5 code {
+  font-size: inherit; }
+
+h6 tt, h6 code {
+  font-size: inherit; }
+
+h1 {
+  font-size: 28px;
+  color: black; }
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #cccccc;
+  color: black; }
+
+h3 {
+  font-size: 18px; }
+
+h4 {
+  font-size: 16px; }
+
+h5 {
+  font-size: 14px; }
+
+h6 {
+  color: #777777;
+  font-size: 14px; }
+
+p, blockquote, ul, ol, dl, li, table, pre {
+  margin: 15px 0; }
+
+hr {
+  background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAECAYAAACtBE5DAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OENDRjNBN0E2NTZBMTFFMEI3QjRBODM4NzJDMjlGNDgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OENDRjNBN0I2NTZBMTFFMEI3QjRBODM4NzJDMjlGNDgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo4Q0NGM0E3ODY1NkExMUUwQjdCNEE4Mzg3MkMyOUY0OCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo4Q0NGM0E3OTY1NkExMUUwQjdCNEE4Mzg3MkMyOUY0OCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PqqezsUAAAAfSURBVHjaYmRABcYwBiM2QSA4y4hNEKYDQxAEAAIMAHNGAzhkPOlYAAAAAElFTkSuQmCC) repeat-x 0 0;
+  border: 0 none;
+  color: #cccccc;
+  height: 4px;
+  padding: 0;
+}
+
+body > h2:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+body > h1:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+  body > h1:first-child + h2 {
+    margin-top: 0;
+    padding-top: 0; }
+body > h3:first-child, body > h4:first-child, body > h5:first-child, body > h6:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0; }
+
+h1 p, h2 p, h3 p, h4 p, h5 p, h6 p {
+  margin-top: 0; }
+
+li p.first {
+  display: inline-block; }
+li {
+  margin: 0; }
+ul, ol {
+  padding-left: 30px; }
+
+ul :first-child, ol :first-child {
+  margin-top: 0; }
+
+dl {
+  padding: 0; }
+  dl dt {
+    font-size: 14px;
+    font-weight: bold;
+    font-style: italic;
+    padding: 0;
+    margin: 15px 0 5px; }
+    dl dt:first-child {
+      padding: 0; }
+    dl dt > :first-child {
+      margin-top: 0; }
+    dl dt > :last-child {
+      margin-bottom: 0; }
+  dl dd {
+    margin: 0 0 15px;
+    padding: 0 15px; }
+    dl dd > :first-child {
+      margin-top: 0; }
+    dl dd > :last-child {
+      margin-bottom: 0; }
+
+blockquote {
+  border-left: 4px solid #dddddd;
+  padding: 0 15px;
+  color: #777777; }
+  blockquote > :first-child {
+    margin-top: 0; }
+  blockquote > :last-child {
+    margin-bottom: 0; }
+
+table {
+  padding: 0;border-collapse: collapse; }
+  table tr {
+    border-top: 1px solid #cccccc;
+    background-color: white;
+    margin: 0;
+    padding: 0; }
+    table tr:nth-child(2n) {
+      background-color: #f8f8f8; }
+    table tr th {
+      font-weight: bold;
+      border: 1px solid #cccccc;
+      margin: 0;
+      padding: 6px 13px; }
+    table tr td {
+      border: 1px solid #cccccc;
+      margin: 0;
+      padding: 6px 13px; }
+    table tr th :first-child, table tr td :first-child {
+      margin-top: 0; }
+    table tr th :last-child, table tr td :last-child {
+      margin-bottom: 0; }
+
+img {
+  max-width: 100%; }
+
+span.frame {
+  display: block;
+  overflow: hidden; }
+  span.frame > span {
+    border: 1px solid #dddddd;
+    display: block;
+    float: left;
+    overflow: hidden;
+    margin: 13px 0 0;
+    padding: 7px;
+    width: auto; }
+  span.frame span img {
+    display: block;
+    float: left; }
+  span.frame span span {
+    clear: both;
+    color: #333333;
+    display: block;
+    padding: 5px 0 0; }
+span.align-center {
+  display: block;
+  overflow: hidden;
+  clear: both; }
+  span.align-center > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px auto 0;
+    text-align: center; }
+  span.align-center span img {
+    margin: 0 auto;
+    text-align: center; }
+span.align-right {
+  display: block;
+  overflow: hidden;
+  clear: both; }
+  span.align-right > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px 0 0;
+    text-align: right; }
+  span.align-right span img {
+    margin: 0;
+    text-align: right; }
+span.float-left {
+  display: block;
+  margin-right: 13px;
+  overflow: hidden;
+  float: left; }
+  span.float-left span {
+    margin: 13px 0 0; }
+span.float-right {
+  display: block;
+  margin-left: 13px;
+  overflow: hidden;
+  float: right; }
+  span.float-right > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px auto 0;
+    text-align: right; }
+
+code, tt {
+  margin: 0 2px;
+  padding: 0 5px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px; }
+
+pre code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent; }
+
+.highlight pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+  pre code, pre tt {
+    background-color: transparent;
+    border: none; }
+
+sup {
+    font-size: 0.83em;
+    vertical-align: super;
+    line-height: 0;
+}
+* {
+	-webkit-print-color-adjust: exact;
+}
+@media screen and (min-width: 914px) {
+    body {
+        width: 854px;
+        margin:0 auto;
+    }
+}
+@media print {
+	table, pre {
+		page-break-inside: avoid;
+	}
+	pre {
+		word-wrap: break-word;
+	}
+}
+</style>
+</head>
+<body>
+<h1 id="toc_0">Scheme修行(3) gitと少し1章の残り</h1>
+
+<h2 id="toc_1">作業用ブランチの後始末</h2>
+
+<p>newtirブランチが残ったままでした。もう使わないので削除します。
+ブランチの用途によっては恒久的に残すものもありそうです。</p>
+
+<pre><code>$ git log --oneline --decorate --graph --all -3
+* ea4da73 (HEAD -&gt; master, origin/master) 「Scheme修行(2) はじめに ＆ two-in-a-row?」を追加
+* bf4671b (newtir) two-in-a-row?さらにさらに改善版
+* 68cff0f two-in-a-row?をさらに改善
+$ git branch -d newtir
+Deleted branch newtir (was bf4671b).
+$ git log --oneline --decorate --graph --all -3
+* ea4da73 (HEAD -&gt; master, origin/master) 「Scheme修行(2) はじめに ＆ two-in-a-row?」を追加
+* bf4671b two-in-a-row?さらにさらに改善版
+* 68cff0f two-in-a-row?をさらに改善</code></pre>
+
+<p>消えました。git branchでブランチ名を入れなければブランチのリストが表示されます。</p>
+
+<pre><code>$ git branch
+* master</code></pre>
+
+<p>ブランチを消してから気が付きましたが、消す前に一度やっておいたほうがよさそうです。</p>
+
+<p>やっぱり1関数1ファイルは細かすぎる気がするので、章ごとにまとめるくらいにしようと思います。git mvを使うとgitの中の情報とファイル名が同時に変更されます。</p>
+
+<pre><code>$ ls
+blogs           two-in-a-row.rkt
+compiled        util.rkt
+$ git mv two-in-a-row.rkt chap1.rkt
+$ ls
+blogs       chap1.rkt   compiled    util.rkt
+$ git status
+On branch master
+Your branch is up-to-date with &#39;origin/master&#39;.
+Changes to be committed:
+  (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+
+    renamed:    two-in-a-row.rkt -&gt; chap1.rkt
+
+$ git commit -m &#39;ファイル名変更&#39;
+[master 72934fa] ファイル名変更
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ rename two-in-a-row.rkt =&gt; chap1.rkt (100%)
+</code></pre>
+
+<p>別にgit mvでファイル名を変更しないと管理情報とのずれが発生するとかそういう怖い話はなくて、mvでもその他のツールでも使ってファイル名を変更した後、git add・git rmしてやってもいいようです。
+ファイル名の変更も割合気楽にできそうです。</p>
+
+<h2 id="toc_2">sum-of-prefixes</h2>
+
+<p>タップを引数に取り、タップの各要素までの和をリストにして返す関数sum-of-prefixesを作ります。
+今度はチラ見後に書いたコードでテキストと一致しました。</p>
+
+<p>chap1.rkt(抜粋)</p>
+
+<pre><code>(define sum-of-prefixes
+  (lambda (tup)
+    (cond ((null? tup) (quote ()))
+          (else (sum-of-prefixes-b 0 tup)))))
+
+;+はあることにする
+(define sum-of-prefixes-b
+  (lambda (sonssf tup)
+    (cond ((null? tup) (quote ()))
+          (else (cons (+ sonssf (car tup))
+                      (sum-of-prefixes-b (+ sonssf (car tup))
+                                         (cdr tup)))))))</code></pre>
+
+<p>どうやらこの章のテーマは過去の情報を引数で渡すということのようです。
+それは大事な概念なんでしょうか？
+何かの前振り？</p>
+
+<h1 id="toc_3">コミットメッセージの書き換え</h1>
+
+<p>直前のコミットのコミットメッセージはgit commit --amendで修正することができます。</p>
+
+<pre><code>$ git log --oneline -3
+32cd3bc sum-of-prefixes(自分で書いた版)を追加
+72934fa ファイル名変更
+ea4da73 「Scheme修行(2) はじめに ＆ two-in-a-row?」を追加
+$ git commit --amend -m &#39;sum-of-prefixesを追加&#39;
+[sop 63e9da4] sum-of-prefixesを追加
+ Date: Sat Jul 18 11:14:08 2015 +0900
+ 1 file changed, 16 insertions(+)
+$ git log --oneline -3
+63e9da4 sum-of-prefixesを追加
+72934fa ファイル名変更
+ea4da73 「Scheme修行(2) はじめに ＆ two-in-a-row?」を追加</code></pre>
+
+<p>--amendはコミットメッセージを書き換えるオプションというわけではなくて、直前のコミットをやり直す機能なので、addし忘れたとかのときも使えるようです。</p>
+
+<h2 id="toc_4">第11の戒律</h2>
+
+<blockquote>
+<p>ある関数が、その関数に対する他の引数がいかなるものか知る必要があるときは、付加的な引数を用いるべし。</p>
+</blockquote>
+
+<p>おお、なるほど！という感じはあまりしません。
+理解が足りないんでしょうか。
+5回読んだらおおなるほどってなる？
+訳がこなれてない感じもします。
+名訳だったらなるほどかっていうとそんな気もしませんが。</p>
+
+<h2 id="toc_5">scrambleって何</h2>
+
+<p>次はscarambleという関数を作ります。
+自分では説明できないので引用します。</p>
+
+<blockquote>
+<p>関数scrambleは、どの数も自分の位置を示す番号より大きくない空でないタップを取って、同じ長さのタップを返します。
+引数の中のそれぞれの数は、自分を起点としてタップを逆方向にさかのぼる数として扱われます。
+各位置の結果は、その数のぶんだけ現在の位置から逆向きにたどることで見つけられます。</p>
+</blockquote>
+
+<p>これはコード見たほうがわかりやすいかも・・・</p>
+
+<h2 id="toc_6">stash</h2>
+
+<p>scrambleを定義するのに、one?とpickが必要です。
+これは、util.rktに定義します。
+util.rktの修正用にブランチを切りたいと思います。
+しかし、scrambleを途中まで書いてしまいました。
+半端な状態なのでコミットはしたくありません。
+このままブランチを切ってチェックアウトすると、util.rktの修正の方にscrambleの修正が混じってしまいそうです。
+addしなきゃうまくいくのかもしれませんが、そのことに気づいたのは全部終わってからでした。</p>
+
+<p>困りました。なんとかならないでしょうか。
+別ディレクトリにクローンして修正するとか？それもないではなさそうですが・・・
+調べてみると、git stashというのがそれ用のコマンドのようです。
+詳しくは<a href="http://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning">7.3 Git Tools - Stashing and Cleaning</a>を参照。</p>
+
+<p>git stashを実行すると、現在の状態がスタックに保存され、ワーキングディレクトリはコミット直後のクリーンな状態に戻されます。
+他の作業をしてから元のブランチに戻り、git stash applyすると、ワーキングディレクトリが元の状態に戻ります。</p>
+
+<p>やってみます。</p>
+
+<pre><code>$ git status
+On branch scramble
+Changes not staged for commit:
+  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+  (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+
+    modified:   chap1.rkt
+
+$ git stash
+Saved working directory and index state WIP on scramble: 63e9da4 sum-of-prefixesを追加
+HEAD is now at 63e9da4 sum-of-prefixesを追加
+$ git status
+On branch scramble
+nothing to commit, working directory clean</code></pre>
+
+<p>ワーキングディレクトリが元に戻りましたので、いったんmasterブランチに戻り、util.rkt修正用のブランチを切って、修正を行います。
+git log に --all オプションをつけるとスタッシュも表示されますね。やっぱり --all つけといたほうがいいですね。--graphオプションもやっとグラフっぽいものを表示してくれました。</p>
+
+<pre><code>$ git log --oneline --decorate --graph --all -5
+* 50e77c8 (HEAD -&gt; util) one?とpickを追加
+| *   8d96ec1 (refs/stash) WIP on scramble: 63e9da4 sum-of-prefixesを追加
+| |\  
+|/ /  
+| * 7d5e608 index on scramble: 63e9da4 sum-of-prefixesを追加
+|/  
+* 63e9da4 (scramble, master) sum-of-prefixesを追加
+* 72934fa ファイル名変更</code></pre>
+
+<p>utilブランチの修正をmasterにマージしておきます。</p>
+
+<p>git stash apply で保存したスタッシュをワーキングディレクトリに適用します。スタッシュは削除されません。スタッシュを適用してもブランチは現在のブランチのままのようですので、scrambleをチェックアウトしてからスタッシュを適用します。</p>
+
+<pre><code>$ git checkout scramble
+Switched to branch &#39;scramble&#39;
+$ git stash apply
+On branch scramble
+Changes not staged for commit:
+  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+  (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+
+    modified:   chap1.rkt
+
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+$ git log --oneline --decorate --graph --all -5
+* 50e77c8 (util, master) one?とpickを追加
+| *   8d96ec1 (refs/stash) WIP on scramble: 63e9da4 sum-of-prefixesを追加
+| |\  
+|/ /  
+| * 7d5e608 index on scramble: 63e9da4 sum-of-prefixesを追加
+|/  
+* 63e9da4 (HEAD -&gt; scramble) sum-of-prefixesを追加
+* 72934fa ファイル名変更</code></pre>
+
+<p>無事scrambleに戻れましたのでgit stash dropで スタッシュを削除します。コミットログもすっきりしました。</p>
+
+<pre><code>$ git stash drop
+Dropped refs/stash@{0} (8d96ec1822809717f948d81c0ed2b55ef2e1702a)
+$ git log --oneline --decorate --graph --all -5
+* 50e77c8 (util, master) one?とpickを追加
+* 63e9da4 (HEAD -&gt; scramble) sum-of-prefixesを追加
+* 72934fa ファイル名変更
+* ea4da73 (origin/master) 「Scheme修行(2) はじめに ＆ two-in-a-row?」を追加
+* bf4671b two-in-a-row?さらにさらに改善版</code></pre>
+
+<p>あとはmasterブランチの内容をマージして作業を続行します。</p>
+
+<p>スタッシュ関連ではほかにもいくつかコマンドがあります。git stash list はスタッシュの一覧を、git stash show はスタッシュの内容を表示します。</p>
+
+<pre><code>$ git stash list
+stash@{0}: WIP on scramble: 63e9da4 sum-of-prefixesを追加
+$ git stash show
+ chap1.rkt | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)</code></pre>
+
+<p>git stash pop は保存したスタッシュをワーキングディレクトリに適用し、スタッシュを削除します。慣れたらこっちのほうが速いかもしれませんが、不安を感じるうちは思ったとおりに復元できてからdropしたほうがよさそうです。</p>
+
+<h2 id="toc_7">scrambleの定義</h2>
+
+<p>scrambleの定義は以下のとおりです。</p>
+
+<p>chap1.rkt(抜粋)</p>
+
+<pre><code>(define scramble
+  (lambda (tup)
+    (scramble-b tup (quote ()))))
+
+(define scramble-b
+  (lambda (tup rev-pre)
+    (cond ((null? tup) (quote ()))
+          (else (cons (pick (car tup) (cons (car tup) rev-pre))
+                      (scramble-b (cdr tup)
+                                  (cons (car tup) rev-pre)))))))</code></pre>
+
+<p>戒律通りですね、という以外にあまり書くことがありません・・・</p>
+
+<h2 id="toc_8">今回覚えたgitコマンド</h2>
+
+<p>やっぱりgitの練習みたいになってしまいました。
+始める前はaddとcommitだけでいいかと思っていたんですがついブランチに手を出したら沼にハマり気味です。
+今回新しく使ったgitコマンドは以下のとおりです。
+記事に書かなかったものも含め記載しています。</p>
+
+<ul>
+<li>git branch -d ブランチを削除</li>
+<li>git checkout -b ブランチを作成してチェックアウト</li>
+<li>git mv ファイル名を変更</li>
+<li>git log -<n> 新しい方からn個分のコミットだけ表示</li>
+<li>git commit -m コマンドラインでコミットメッセージを指定</li>
+<li>git commit --amend 直前のコミットをやり直す</li>
+<li>git stash スタッシュに保存</li>
+<li>git stash list 保存されたスタッシュの一覧</li>
+<li>git stash show スタッシュの内容を表示</li>
+<li>git stash apply 保存されたスタッシュを適用</li>
+<li>git stash drop 保存されたスタッシュを削除</li>
+<li>git stash pop 保存されたスタッシュを適用して削除</li>
+</ul>
+
+
+</body>
+
+</html>
