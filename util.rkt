@@ -36,3 +36,19 @@
 
 (check-equal? (pick 1 '(2)) 2)
 (check-equal? (pick 2 '(1 2 3)) 2)
+
+(define Y
+  (lambda (le)
+    ((lambda (f) (f f))
+     (lambda (f) (le (lambda (x) ((f f) x)))))))
+
+(check-equal?
+ ((Y
+   (lambda (length)
+     (lambda (l)
+       (cond ((null? l) 0)
+             (else (add1 (length (cdr l))))))))
+  '(a b c))
+ 3)
+
+ 
