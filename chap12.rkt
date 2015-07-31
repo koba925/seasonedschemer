@@ -61,3 +61,151 @@
 (check-equal? (multirember-r2 'a '(a b)) '(b))
 (check-equal? (multirember-r2 'a '(b c)) '(b c))
 (check-equal? (multirember-r2 'a '(a b a)) '(b))
+
+(define rember-f
+  (lambda (test?)
+    (lambda (a l)
+      (cond ((null? l) (quote ()))
+            ((test? (car l) a) (cdr l))
+            (else (cons (car l) ((rember-f test?) a (cdr l))))))))
+
+(define rember-eq? (rember-f eq?))
+
+(check-equal? (rember-eq? 'a '()) '())
+(check-equal? (rember-eq? 'a '(a)) '())
+(check-equal? (rember-eq? 'a '(b)) '(b))
+(check-equal? (rember-eq? 'a '(a b)) '(b))
+(check-equal? (rember-eq? 'a '(b a)) '(b))
+(check-equal? (rember-eq? 'a '((a) b)) '((a) b))
+
+(define rember-equal? (rember-f equal?))
+
+(check-equal? (rember-equal? '(a) '((a) b)) '(b))
+
+(define multirember-f
+  (lambda (test?)
+    (lambda (a l)
+      (cond ((null? l) (quote ()))
+            ((test? (car l) a) ((multirember-f test?) a (cdr l)))
+            (else (cons (car l) ((multirember-f test?) a (cdr l))))))))
+
+(define multirember-eq? (multirember-f eq?))
+
+(check-equal? (multirember-eq? 'a '(a b)) '(b))
+(check-equal? (multirember-eq? 'a '(b c)) '(b c))
+(check-equal? (multirember-eq? 'a '(a b a)) '(b))
+
+(define multirember-equal? (multirember-f equal?))
+
+(check-equal? (multirember-equal? '(a) '((a) b)) '(b))
+(check-equal? (multirember-equal? '(a) '(b c)) '(b c))
+(check-equal? (multirember-equal? '(a) '((a) b (a))) '(b))
+
+(define multirember-f2
+  (lambda (test?)
+    (letrec
+        ((m-f
+          (lambda (a l)
+            (cond ((null? l) (quote ()))
+                  ((test? (car l) a) (m-f a (cdr l)))
+                  (else (cons (car l) (m-f a (cdr l))))))))
+      m-f)))
+
+(define multirember-eq?2 (multirember-f2 eq?))
+
+(check-equal? (multirember-eq?2 'a '(a b)) '(b))
+(check-equal? (multirember-eq?2 'a '(b c)) '(b c))
+(check-equal? (multirember-eq?2 'a '(a b a)) '(b))
+
+(define multirember-equal?2 (multirember-f2 equal?))
+
+(check-equal? (multirember-equal?2 '(a) '((a) b)) '(b))
+(check-equal? (multirember-equal?2 '(a) '(b c)) '(b c))
+(check-equal? (multirember-equal?2 '(a) '((a) b (a))) '(b))
+
+;第3のmultirember
+;aを引数に取ってる
+;なぜここで
+(define multirember-r3
+  (letrec
+      ((mr (lambda (a lat)
+             (cond ((null? lat) (quote ()))
+                   ((eq? (car lat) a) (mr a (cdr lat)))
+                   (else (cons (car lat) (mr a (cdr lat))))))))
+    mr))
+
+(check-equal? (multirember-r3 'a '()) '())
+(check-equal? (multirember-r3 'a '(a b)) '(b))
+(check-equal? (multirember-r3 'a '(b c)) '(b c))
+(check-equal? (multirember-r3 'a '(a b a)) '(b))
+
+;何をやっているんだ
+(define multirember-r4
+  (letrec
+      ((multirember
+        (lambda (a lat)
+          (cond ((null? lat) (quote ()))
+                ((eq? (car lat) a) (multirember a (cdr lat)))
+                (else (cons (car lat) (multirember a (cdr lat))))))))
+    multirember))
+
+(check-equal? (multirember-r4 'a '()) '())
+(check-equal? (multirember-r4 'a '(a b)) '(b))
+(check-equal? (multirember-r4 'a '(b c)) '(b c))
+(check-equal? (multirember-r4 'a '(a b a)) '(b))
+
+;letrecを取る
+(define multirember-r5
+  (lambda (a lat)
+    (cond ((null? lat) (quote ()))
+          ((eq? (car lat) a) (multirember-r5 a (cdr lat)))
+          (else (cons (car lat) (multirember-r5 a (cdr lat)))))))
+
+(check-equal? (multirember-r5 'a '()) '())
+(check-equal? (multirember-r5 'a '(a b)) '(b))
+(check-equal? (multirember-r5 'a '(b c)) '(b c))
+(check-equal? (multirember-r5 'a '(a b a)) '(b))
+
+(define member?
+  (lambda (a lat)
+    (cond ((null? lat) #f)
+          ((eq? (car lat) a) #t)
+          (else (member? a (cdr lat))))))
+
+(check-false (member? 'a '()))
+(check-true (member? 'a '(a)))
+(check-false (member? 'a '(b)))
+(check-true (member? 'a '(b a)))
+(check-false (member? 'a '(b b)))
+
+(define member?-r
+  (lambda (a lat)
+    ((letrec
+         ((yes? (lambda (l)
+                  (cond ((null? l) #f)
+                        ((eq? (car l) a) #t)
+                        (else (yes? (cdr l)))))))
+       yes?)
+     lat)))
+
+(check-false (member?-r 'a '()))
+(check-true (member?-r 'a '(a)))
+(check-false (member?-r 'a '(b)))
+(check-true (member?-r 'a '(b a)))
+(check-false (member?-r 'a '(b b)))
+
+(define member?-r2
+  (lambda (a lat)
+    (letrec
+        ((yes? (lambda (l)
+                 (cond ((null? l) #f)
+                       ((eq? (car l) a) #t)
+                       (else (yes? (cdr l)))))))
+      (yes? lat))))
+
+(check-false (member?-r2 'a '()))
+(check-true (member?-r2 'a '(a)))
+(check-false (member?-r2 'a '(b)))
+(check-true (member?-r2 'a '(b a)))
+(check-false (member?-r2 'a '(b b)))
+
