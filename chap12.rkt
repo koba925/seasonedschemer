@@ -281,4 +281,48 @@
 (check-equal? (union-m2 '(a b) '(b)) '(a b))
 (check-equal? (union-m2 '(a) '(a b)) '(a b))
 
+(define two-in-a-row?
+  (lambda (lat)
+    (cond ((null? lat) #f)
+          (else (two-in-a-row-b? (car lat) (cdr lat))))))
 
+(define two-in-a-row-b?
+  (lambda (preceeding lat)
+    (cond ((null? lat) #f)
+          (else (or (eq? (car lat) preceeding)
+                    (two-in-a-row-b? (car lat) (cdr lat)))))))
+
+(check-false (two-in-a-row? '()))
+(check-false (two-in-a-row? '(a)))
+(check-false (two-in-a-row? '(a b)))
+(check-true (two-in-a-row? '(a a)))
+
+(define two-in-a-row-r?
+  (lambda (lat)
+    (letrec
+        ((W (lambda (a lat)
+              (cond ((null? lat) #f)
+                    (else (or (eq? (car lat) a)
+                              (W (car lat) (cdr lat))))))))
+      (cond ((null? lat) #f)
+            (else (W (car lat) (cdr lat)))))))
+
+(check-false (two-in-a-row-r? '()))
+(check-false (two-in-a-row-r? '(a)))
+(check-false (two-in-a-row-r? '(a b)))
+(check-true (two-in-a-row-r? '(a a)))
+
+(define two-in-a-row-r2?
+  (letrec
+      ((W (lambda (a lat)
+            (cond ((null? lat) #f)
+                  (else (or (eq? (car lat) a)
+                            (W (car lat) (cdr lat))))))))
+    (lambda (lat)
+      (cond ((null? lat) #f)
+            (else (W (car lat) (cdr lat)))))))
+
+(check-false (two-in-a-row-r2? '()))
+(check-false (two-in-a-row-r2? '(a)))
+(check-false (two-in-a-row-r2? '(a b)))
+(check-true (two-in-a-row-r2? '(a a)))
