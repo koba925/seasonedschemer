@@ -209,3 +209,76 @@
 (check-true (member?-r2 'a '(b a)))
 (check-false (member?-r2 'a '(b b)))
 
+(define union
+  (lambda (set1 set2)
+    (cond ((null? set1) set2)
+          ((member? (car set1) set2) (union (cdr set1) set2))
+          (else (cons (car set1) (union (cdr set1) set2))))))
+
+(check-equal? (union '() '()) '())
+(check-equal? (union '(a) '()) '(a))
+(check-equal? (union '() '(b)) '(b))
+(check-equal? (union '(a) '(b)) '(a b))
+(check-equal? (union '(a b) '(b)) '(a b))
+(check-equal? (union '(a) '(a b)) '(a b))
+
+(define union-r
+  (lambda (set1 set2)
+    (letrec
+        ((U (lambda (set)
+              (cond ((null? set) set2)
+                    ((member? (car set) set2) (U (cdr set)))
+                    (else (cons (car set) (U (cdr set))))))))
+      (U set1))))
+
+(check-equal? (union-r '() '()) '())
+(check-equal? (union-r '(a) '()) '(a))
+(check-equal? (union-r '() '(b)) '(b))
+(check-equal? (union-r '(a) '(b)) '(a b))
+(check-equal? (union-r '(a b) '(b)) '(a b))
+(check-equal? (union-r '(a) '(a b)) '(a b))
+
+(define union-m
+  (lambda (set1 set2)
+    (letrec
+        ((U (lambda (set)
+              (cond ((null? set) set2)
+                    ((M? (car set) set2) (U (cdr set)))
+                    (else (cons (car set) (U (cdr set)))))))
+         (M? (lambda (a lat)
+               (cond ((null? lat) #f)
+                     ((eq? (car lat) a) #t)
+                     (else (M? a (cdr lat)))))))
+      (U set1))))
+
+(check-equal? (union-m '() '()) '())
+(check-equal? (union-m '(a) '()) '(a))
+(check-equal? (union-m '() '(b)) '(b))
+(check-equal? (union-m '(a) '(b)) '(a b))
+(check-equal? (union-m '(a b) '(b)) '(a b))
+(check-equal? (union-m '(a) '(a b)) '(a b))
+
+(define union-m2
+  (lambda (set1 set2)
+    (letrec
+        ((U (lambda (set)
+              (cond ((null? set) set2)
+                    ((M? (car set) set2) (U (cdr set)))
+                    (else (cons (car set) (U (cdr set)))))))
+         (M? (lambda (a lat)
+               (letrec
+                   ((N? (lambda (lat)
+                          (cond ((null? lat) #f)
+                                ((eq? (car lat) a) #t)
+                                (else (N? (cdr lat)))))))
+                 (N? lat)))))
+      (U set1))))
+
+(check-equal? (union-m2 '() '()) '())
+(check-equal? (union-m2 '(a) '()) '(a))
+(check-equal? (union-m2 '() '(b)) '(b))
+(check-equal? (union-m2 '(a) '(b)) '(a b))
+(check-equal? (union-m2 '(a b) '(b)) '(a b))
+(check-equal? (union-m2 '(a) '(a b)) '(a b))
+
+
