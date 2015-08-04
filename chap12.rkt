@@ -166,6 +166,20 @@
 (check-equal? (multirember-r5 'a '(b c)) '(b c))
 (check-equal? (multirember-r5 'a '(a b a)) '(b))
 
+(letrec
+    ((ev? (lambda (n)
+            (cond ((zero? n) #t)
+                  (else (od? (sub1 n))))))
+     (od? (lambda (n)
+            (cond ((zero? n) #f)
+                  (else (ev? (sub1 n)))))))
+  (check-true (ev? 0))
+  (check-false (od? 0))
+  (check-false (ev? 1))
+  (check-true (od? 1))
+  (check-true (ev? 2))
+  (check-false (od? 2)))
+    
 (define member?
   (lambda (a lat)
     (cond ((null? lat) #f)
@@ -326,3 +340,62 @@
 (check-false (two-in-a-row-r2? '(a)))
 (check-false (two-in-a-row-r2? '(a b)))
 (check-true (two-in-a-row-r2? '(a a)))
+
+(define sum-of-prefixes
+  (lambda (tup)
+    (sum-of-prefixes-b 0 tup)))
+
+(define sum-of-prefixes-b
+  (lambda (sonssf tup)
+    (cond ((null? tup) (quote ()))
+          (else (cons (+ sonssf (car tup))
+                      (sum-of-prefixes-b (+ sonssf (car tup))
+                                         (cdr tup)))))))
+
+(check-equal? (sum-of-prefixes '()) '())
+(check-equal? (sum-of-prefixes '(1)) '(1))
+(check-equal? (sum-of-prefixes '(1 2)) '(1 3))
+
+(define sum-of-prefixes-r
+  (letrec
+      ((S (lambda (sss tup)
+            (cond ((null? tup) (quote ()))
+                  (else (cons (+ sss (car tup))
+                              (S (+ sss (car tup)) (cdr tup))))))))
+    (lambda (tup)
+      (S 0 tup))))
+
+(check-equal? (sum-of-prefixes-r '()) '())
+(check-equal? (sum-of-prefixes-r '(1)) '(1))
+(check-equal? (sum-of-prefixes-r '(1 2)) '(1 3))
+
+(define scramble
+  (lambda (tup)
+    (scramble-b tup (quote ()))))
+
+(define scramble-b
+  (lambda (tup rev-pre)
+    (cond ((null? tup) (quote ()))
+          (else (cons (pick (car tup) (cons (car tup) rev-pre))
+                      (scramble-b (cdr tup)
+                                  (cons (car tup) rev-pre)))))))
+
+(check-equal? (scramble '()) '())
+(check-equal? (scramble '(1)) '(1))
+(check-equal? (scramble '(1 1 1 3 4 2 1 1 9 2)) '(1 1 1 1 1 4 1 1 1 9))
+
+(define scramble-r
+  (letrec
+      ((P (lambda (tup rp)
+            (cond ((null? tup) (quote ()))
+                  (else (cons (pick (car tup)
+                                    (cons (car tup) rp))
+                              (P (cdr tup)
+                                 (cons (car tup) rp))))))))
+    (lambda (tup)
+      (P tup (quote ())))))
+
+
+(check-equal? (scramble '()) '())
+(check-equal? (scramble '(1)) '(1))
+(check-equal? (scramble '(1 1 1 3 4 2 1 1 9 2)) '(1 1 1 1 1 4 1 1 1 9))
