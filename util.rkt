@@ -2,7 +2,7 @@
 
 (require rackunit)
 
-(provide atom? add1 sub1 one? pick Y)
+(provide atom? add1 sub1 one? pick member? Y)
 
 (define atom?
   (lambda (x)
@@ -37,6 +37,21 @@
 (check-equal? (pick 1 '(2)) 2)
 (check-equal? (pick 2 '(1 2 3)) 2)
 
+(define member?
+  (lambda (a lat)
+    (letrec
+        ((M (lambda (lat)
+              (cond ((null? lat) #f)
+                    (else (or (eq? (car lat) a)
+                              (M (cdr lat))))))))
+      (M lat))))
+
+(check-false (member? 'a '()))
+(check-true (member? 'a '(a)))
+(check-false (member? 'a '(b)))
+(check-true (member? 'a '(b a)))
+(check-false (member? 'a '(b b)))
+
 (define Y
   (lambda (le)
     ((lambda (f) (f f))
@@ -50,5 +65,3 @@
              (else (add1 (length (cdr l))))))))
   '(a b c))
  3)
-
- 
