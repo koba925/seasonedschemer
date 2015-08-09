@@ -21,10 +21,12 @@
 
 (define intersectall
   (lambda (lset)
-    (cond ((null? (cdr lset)) (car lset))
+    (cond ((null? lset) (quote ()))
+          ((null? (cdr lset)) (car lset))
           (else (intersect (car lset)
                            (intersectall (cdr lset)))))))
 
+(check-equal? (intersectall '(())) '())
 (check-equal? (intersectall '((a))) '(a))
 (check-equal? (intersectall '((a) (a))) '(a))
 (check-equal? (intersectall '((a) (b))) '())
