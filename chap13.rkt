@@ -18,3 +18,15 @@
 (check-equal? (intersect '() '(a)) '())
 (check-equal? (intersect '(a) '(b)) '())
 (check-equal? (intersect '(a) '(a)) '(a))
+
+(define intersectall
+  (lambda (lset)
+    (cond ((null? (cdr lset)) (car lset))
+          (else (intersect (car lset)
+                           (intersectall (cdr lset)))))))
+
+(check-equal? (intersectall '((a))) '(a))
+(check-equal? (intersectall '((a) (a))) '(a))
+(check-equal? (intersectall '((a) (b))) '())
+(check-equal? (intersectall '((a) (a) (a))) '(a))
+(check-equal? (intersectall '((a) (a) (b))) '())
