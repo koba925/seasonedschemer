@@ -11,7 +11,8 @@
                     ((member? (car set) set2)
                      (cons (car set) (I (cdr set))))
                     (else (I (cdr set)))))))
-      (I set1))))
+      (cond ((null? set2) (quote ()))
+            (else (I set1))))))
 
 (check-equal? (intersect '() '()) '())
 (check-equal? (intersect '(a) '()) '())
