@@ -28,8 +28,16 @@
                 (cond ((null? (car lset))
                        (hop (quote ())))
                       ((null? (cdr lset)) (car lset))
-                      (else (intersect (car lset)
-                                       (A (cdr lset))))))))
+                      (else (I (car lset) (A (cdr lset)))))))
+           (I (lambda (set1 set2)
+                (letrec
+                    ((J (lambda (set1)
+                          (cond ((null? set1) (quote ()))
+                                ((member? (car set1) set2)
+                                 (cons (car set1) (J (cdr set1))))
+                                (else (J (cdr set1)))))))
+                  (cond ((null? set2) (quote ()))
+                        (else (J set1)))))))
         (cond ((null? lset) (quote()))
               (else (A lset)))))))
 
