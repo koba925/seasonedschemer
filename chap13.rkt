@@ -36,7 +36,7 @@
                                 ((member? (car set1) set2)
                                  (cons (car set1) (J (cdr set1))))
                                 (else (J (cdr set1)))))))
-                  (cond ((null? set2) (quote ()))
+                  (cond ((null? set2) (hop (quote ())))
                         (else (J set1)))))))
         (cond ((null? lset) (quote()))
               (else (A lset)))))))
