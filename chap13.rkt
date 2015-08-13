@@ -58,5 +58,97 @@
 ; (let/cc hop (quote ()))
 ; (quote ())
 
+(define rember
+  (lambda (a lat)
+    (letrec
+        ((R (lambda (lat)
+              (cond
+                ((null? lat) (quote ()))
+                ((eq? (car lat) a) (cdr lat))
+                (else (cons (car lat) (R (cdr lat))))))))
+      (R lat))))
 
+(check-equal? (rember 'a '()) '())
+(check-equal? (rember 'a '(a b c)) '(b c))
+(check-equal? (rember 'a '(b a c)) '(b c))
+(check-equal? (rember 'a '(a b a)) '(b a))
 
+(define rember-beyond-first
+  (lambda (a lat)
+    (letrec
+        ((R (lambda (lat)
+              (cond
+                ((null? lat) (quote ()))
+                ((eq? (car lat) a) (quote ()))
+                (else (cons (car lat) (R (cdr lat))))))))
+      (R lat))))
+
+(check-equal? (rember-beyond-first 'a '()) '())
+(check-equal? (rember-beyond-first 'a '(a)) '())
+(check-equal? (rember-beyond-first 'a '(a b)) '())
+(check-equal? (rember-beyond-first 'a '(b a c)) '(b))
+(check-equal? (rember-beyond-first 'a '(b c d)) '(b c d))
+
+;これではダメ
+;毎回hopに継続を保存してしまうからhopしても意味がなくなっている
+;(define rember-upto-last
+;  (lambda (a lat)
+;    (let/cc hop
+;      (cond ((null? lat) (quote ()))
+;            ((eq? (car lat) a) (hop (rember-upto-last a (cdr lat))))
+;            (else (cons (car lat) (rember-upto-last a (cdr lat))))))))
+;手で展開して確かめる
+
+;(define r
+;  (lambda (a lat)
+;    (let/cc hop
+;      (cond ((null? lat) (quote ()))
+;            ((eq? (car lat) a) (hop (r a (cdr lat))))
+;            (else (cons (car lat) (r a (cdr lat))))))))
+;
+;(r 'a '(b a c a d))
+;(let/cc hop (cons 'b (r 'a '(a c a d))))
+;(let/cc hop (cons 'b (let/cc hop (hop (r 'a '(c a d))))))
+;(let/cc hop (cons 'b (let/cc hop (hop (let/cc hop (cons 'c (r 'a '(a d))))))))
+;(let/cc hop (cons 'b (let/cc hop (hop (let/cc hop (cons 'c (let/cc hop (hop (r 'a '(d))))))))))
+;(let/cc hop (cons 'b (let/cc hop (hop (let/cc hop (cons 'c (let/cc hop (hop (let/cc hop (cons 'd (r 'a '())))))))))))
+;(let/cc hop (cons 'b (let/cc hop (hop (let/cc hop (cons 'c (let/cc hop (hop (let/cc hop (cons 'd (let/cc hop (quote ()))))))))))))
+;(let/cc hop (cons 'b (let/cc hop (hop (let/cc hop (cons 'c (let/cc hop (hop (let/cc hop (cons 'd '()))))))))))
+;(let/cc hop (cons 'b (let/cc hop (hop (let/cc hop (cons 'c (let/cc hop (hop (let/cc hop '(d))))))))))
+;(let/cc hop (cons 'b (let/cc hop (hop (let/cc hop (cons 'c (let/cc hop (hop '(d)))))))))
+;(let/cc hop (cons 'b (let/cc hop (hop (let/cc hop (cons 'c '(d)))))))
+;(let/cc hop (cons 'b (let/cc hop (hop (let/cc hop '(c d))))))
+;(let/cc hop (cons 'b (let/cc hop '(c d))))
+;(let/cc hop (cons 'b '(c d)))
+;(let/cc hop '(b c d))
+;'(b c d)
+
+(define rember-upto-last
+  (lambda (a lat)
+    (let/cc skip
+      (letrec
+          ((R (lambda (lat)
+                (cond
+                  ((null? lat) (quote ()))
+                  ((eq? (car lat) a) (skip (R (cdr lat))))
+                  (else (cons (car lat) (R (cdr lat))))))))
+        (R lat)))))
+  
+(check-equal? (rember-upto-last 'a '()) '())
+(check-equal? (rember-upto-last 'a '(a)) '())
+(check-equal? (rember-upto-last 'a '(a b)) '(b))
+(check-equal? (rember-upto-last 'a '(b a c)) '(c))
+(check-equal? (rember-upto-last 'a '(b c d)) '(b c d))
+(check-equal? (rember-upto-last 'a '(b a c a d)) '(d))
+
+;(rember-upto-last 'a '(b a c a d))
+;(let/cc skip (R '(b a c a d)))
+;(let/cc skip (cons 'b (R '(a c a d))))
+;(let/cc skip (cons 'b (skip (R '(c a d)))))
+;(let/cc skip (cons 'b (skip (cons 'c (R '(a d))))))
+;(let/cc skip (cons 'b (skip (cons 'c (skip (R '(d)))))))
+;(let/cc skip (cons 'b (skip (cons 'c (skip (cons 'd (R '())))))))
+;(let/cc skip (cons 'b (skip (cons 'c (skip (cons 'd '()))))))
+;(let/cc skip (cons 'b (skip (cons 'c (skip '(d))))))
+;(let/cc skip '(d))
+;'(d)
