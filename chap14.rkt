@@ -28,3 +28,22 @@
 (check-equal? (leftmost2 '(() (a) b)) 'a)
 (check-equal? (leftmost2 '((()) (a) b)) 'a)
 (check-equal? (leftmost2 '((()) (() a) b)) 'a)
+
+(define leftmost3
+  (lambda (l)
+    (cond
+      ((null? l) (quote ()))
+      ((atom? (car l)) (car l))
+      (else
+       (let ((a (leftmost3 (car l))))
+         (cond
+           ((atom? a) a)
+           (else (leftmost3 (cdr l)))))))))
+
+(check-equal? (leftmost3 '()) '())
+(check-equal? (leftmost3 '(a)) 'a)
+(check-equal? (leftmost3 '(a b)) 'a)
+(check-equal? (leftmost3 '((a) b)) 'a)
+(check-equal? (leftmost3 '(() (a) b)) 'a)
+(check-equal? (leftmost3 '((()) (a) b)) 'a)
+(check-equal? (leftmost3 '((()) (() a) b)) 'a)
