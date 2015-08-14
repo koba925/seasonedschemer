@@ -2,7 +2,7 @@
 
 (require rackunit)
 
-(provide atom? add1 sub1 one? pick member? Y)
+(provide atom? add1 sub1 one? eqlist? pick member? Y)
 
 (define atom?
   (lambda (x)
@@ -28,6 +28,22 @@
 
 (check-true (zero? 0))
 (check-false (zero? 1))
+
+(define eqlist?
+  (lambda (l1 l2)
+    (cond
+      ((and (null? l1) (null? l2)) #t)
+      ((or (null? l1) (null? l2)) #f)
+      (else
+       (and (equal? (car l1) (car l2))
+            (eqlist? (cdr l1) (cdr l2)))))))
+
+(check-true (eqlist? '() '()))
+(check-false (eqlist? '(a b) '(a)))
+(check-false (eqlist? '(b) '(a b)))
+(check-false (eqlist? '((a) b) '(a b)))
+(check-false (eqlist? '(a (b)) '(a b)))
+(check-true (eqlist? '((a) (b)) '((a) (b))))
 
 (define pick
   (lambda (n lat)
