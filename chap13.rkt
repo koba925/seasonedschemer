@@ -50,6 +50,7 @@
 (check-equal? (intersectall '((a) (a) (b))) '())
 (check-equal? (intersectall '((a b c) (c a d) (b e c))) '(c))
 (check-equal? (intersectall '((a b c) () (b e c))) '())
+(check-equal? (intersectall '((a b) (c d) (e f) (g h))) '())
 
 ; (intersectall-c '((a b c) () (b e c)))
 ; (let/cc hop (A '((a b c) () (b e c))))
@@ -57,6 +58,51 @@
 ; (let/cc hop (intersect '(a b c) (hop (quote ()))))
 ; (let/cc hop (quote ()))
 ; (quote ())
+
+;(intersectall '((a b) (c d) (e f) (g h)))
+;(let/cc hop (A '((a b) (c d) (e f) (g h))))
+;(let/cc hop (I '(a b) (A '((c d) (e f) (g h)))))
+;(let/cc hop (I '(a b) (I '(c d) (A '((e f) (g h))))))
+;(let/cc hop (I '(a b) (I '(c d) (I '(e f) (A '((g h)))))))
+;(let/cc hop (I '(a b) (I '(c d) (I '(e f) '(g h)))))
+;(let/cc hop (I '(a b) (I '(c d) '())))
+;(let/cc hop (I '(a b) (hop (quote ()))))
+;(let/cc hop (quote ()))
+;(quote ())
+
+(define intersect2
+  (lambda (set1 set2 hop)
+    (letrec
+        ((I (lambda (set)
+              (cond ((null? set) (quote ()))
+                    ((member? (car set) set2)
+                     (cons (car set) (I (cdr set))))
+                    (else (I (cdr set)))))))
+      (cond ((null? set2) (hop (quote ())))
+            (else (I set1))))))
+
+(define intersectall2
+  (lambda (lset)
+    (let/cc hop
+      (letrec
+          ((A (lambda (lset)
+                (cond ((null? (car lset))
+                       (hop (quote ())))
+                      ((null? (cdr lset)) (car lset))
+                      (else (intersect2 (car lset) (A (cdr lset)) hop))))))
+        (cond ((null? lset) (quote()))
+              (else (A lset)))))))
+
+(check-equal? (intersectall2 '()) '())
+(check-equal? (intersectall2 '(())) '())
+(check-equal? (intersectall2 '((a))) '(a))
+(check-equal? (intersectall2 '((a) (a))) '(a))
+(check-equal? (intersectall2 '((a) (b))) '())
+(check-equal? (intersectall2 '((a) (a) (a))) '(a))
+(check-equal? (intersectall2 '((a) (a) (b))) '())
+(check-equal? (intersectall2 '((a b c) (c a d) (b e c))) '(c))
+(check-equal? (intersectall2 '((a b c) () (b e c))) '())
+(check-equal? (intersectall2 '((a b) (c d) (e f) (g h))) '())
 
 (define rember
   (lambda (a lat)
