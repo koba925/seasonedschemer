@@ -2,7 +2,7 @@
 
 (require rackunit)
 
-(provide atom? add1 sub1 one? pick member? Y)
+(provide atom? add1 sub1 one? pick member? reverse Y)
 
 (define atom?
   (lambda (x)
@@ -36,6 +36,17 @@
 
 (check-equal? (pick 1 '(2)) 2)
 (check-equal? (pick 2 '(1 2 3)) 2)
+
+(define reverse
+  (letrec
+      ((R (lambda (lat rev)
+            (cond ((null? lat) rev)
+                  (else (R (cdr lat) (cons (car lat) rev)))))))
+    (lambda (lat) (R lat (quote ())))))
+
+(check-equal? (reverse '()) '())
+(check-equal? (reverse '(a)) '(a))
+(check-equal? (reverse '(a b)) '(b a))
 
 (define member?
   (lambda (a lat)

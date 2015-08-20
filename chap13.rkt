@@ -187,6 +187,25 @@
 (check-equal? (rember-upto-last 'a '(b c d)) '(b c d))
 (check-equal? (rember-upto-last 'a '(b a c a d)) '(d))
 
+(define rember-upto-last&co
+  (lambda (a lat)
+    (letrec
+        ((R (lambda (lat col)
+              (cond
+                ((null? lat) (col (quote ())))
+                ((eq? (car lat) a)
+                 (R (cdr lat) (lambda (x) x)))
+                (else
+                 (R (cdr lat) (lambda (x) (col (cons (car lat) x)))))))))
+      (R lat (lambda (x) x)))))
+
+(check-equal? (rember-upto-last&co 'a '()) '())
+(check-equal? (rember-upto-last&co 'a '(a)) '())
+(check-equal? (rember-upto-last&co 'a '(a b)) '(b))
+(check-equal? (rember-upto-last&co 'a '(b a c)) '(c))
+(check-equal? (rember-upto-last&co 'a '(b c d)) '(b c d))
+(check-equal? (rember-upto-last&co 'a '(b c a b c a c d)) '(c d))
+
 ;(rember-upto-last 'a '(b a c a d))
 ;(let/cc skip (R '(b a c a d)))
 ;(let/cc skip (cons 'b (R '(a c a d))))
@@ -198,3 +217,20 @@
 ;(let/cc skip (cons 'b (skip (cons 'c (skip '(d))))))
 ;(let/cc skip '(d))
 ;'(d)
+
+(define my-rember-upto-last
+  (lambda (a lat)
+    (letrec
+        ((R (lambda (rlat result)
+              (cond ((null? rlat) result)
+                    ((eq? (car rlat) a) result)
+                    (else (R (cdr rlat) (cons (car rlat) result)))))))
+    (R (reverse lat) (quote ())))))
+
+(check-equal? (my-rember-upto-last 'a '()) '())
+(check-equal? (my-rember-upto-last 'a '(a)) '())
+(check-equal? (my-rember-upto-last 'a '(a b)) '(b))
+(check-equal? (my-rember-upto-last 'a '(b a c)) '(c))
+(check-equal? (my-rember-upto-last 'a '(b c d)) '(b c d))
+(check-equal? (my-rember-upto-last 'a '(b a c a d)) '(d))
+
