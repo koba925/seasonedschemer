@@ -1,0 +1,668 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer06</title>
+<style type="text/css">
+body {
+  font-family: Helvetica, arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: white;
+  padding: 30px; }
+
+body > *:first-child {
+  margin-top: 0 !important; }
+body > *:last-child {
+  margin-bottom: 0 !important; }
+
+a {
+  color: #4183C4; }
+a.absent {
+  color: #cc0000; }
+a.anchor {
+  display: block;
+  padding-left: 30px;
+  margin-left: -30px;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0; }
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 20px 0 10px;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+  cursor: text;
+  position: relative; }
+
+h1:hover a.anchor, h2:hover a.anchor, h3:hover a.anchor, h4:hover a.anchor, h5:hover a.anchor, h6:hover a.anchor {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA09pVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoMTMuMCAyMDEyMDMwNS5tLjQxNSAyMDEyLzAzLzA1OjIxOjAwOjAwKSAgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OUM2NjlDQjI4ODBGMTFFMTg1ODlEODNERDJBRjUwQTQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OUM2NjlDQjM4ODBGMTFFMTg1ODlEODNERDJBRjUwQTQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo5QzY2OUNCMDg4MEYxMUUxODU4OUQ4M0REMkFGNTBBNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo5QzY2OUNCMTg4MEYxMUUxODU4OUQ4M0REMkFGNTBBNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PsQhXeAAAABfSURBVHjaYvz//z8DJYCRUgMYQAbAMBQIAvEqkBQWXI6sHqwHiwG70TTBxGaiWwjCTGgOUgJiF1J8wMRAIUA34B4Q76HUBelAfJYSA0CuMIEaRP8wGIkGMA54bgQIMACAmkXJi0hKJQAAAABJRU5ErkJggg==) no-repeat 10px center;
+  text-decoration: none; }
+
+h1 tt, h1 code {
+  font-size: inherit; }
+
+h2 tt, h2 code {
+  font-size: inherit; }
+
+h3 tt, h3 code {
+  font-size: inherit; }
+
+h4 tt, h4 code {
+  font-size: inherit; }
+
+h5 tt, h5 code {
+  font-size: inherit; }
+
+h6 tt, h6 code {
+  font-size: inherit; }
+
+h1 {
+  font-size: 28px;
+  color: black; }
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #cccccc;
+  color: black; }
+
+h3 {
+  font-size: 18px; }
+
+h4 {
+  font-size: 16px; }
+
+h5 {
+  font-size: 14px; }
+
+h6 {
+  color: #777777;
+  font-size: 14px; }
+
+p, blockquote, ul, ol, dl, li, table, pre {
+  margin: 15px 0; }
+
+hr {
+  background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAECAYAAACtBE5DAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OENDRjNBN0E2NTZBMTFFMEI3QjRBODM4NzJDMjlGNDgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OENDRjNBN0I2NTZBMTFFMEI3QjRBODM4NzJDMjlGNDgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo4Q0NGM0E3ODY1NkExMUUwQjdCNEE4Mzg3MkMyOUY0OCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo4Q0NGM0E3OTY1NkExMUUwQjdCNEE4Mzg3MkMyOUY0OCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PqqezsUAAAAfSURBVHjaYmRABcYwBiM2QSA4y4hNEKYDQxAEAAIMAHNGAzhkPOlYAAAAAElFTkSuQmCC) repeat-x 0 0;
+  border: 0 none;
+  color: #cccccc;
+  height: 4px;
+  padding: 0;
+}
+
+body > h2:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+body > h1:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+  body > h1:first-child + h2 {
+    margin-top: 0;
+    padding-top: 0; }
+body > h3:first-child, body > h4:first-child, body > h5:first-child, body > h6:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0; }
+
+h1 p, h2 p, h3 p, h4 p, h5 p, h6 p {
+  margin-top: 0; }
+
+li p.first {
+  display: inline-block; }
+li {
+  margin: 0; }
+ul, ol {
+  padding-left: 30px; }
+
+ul :first-child, ol :first-child {
+  margin-top: 0; }
+
+dl {
+  padding: 0; }
+  dl dt {
+    font-size: 14px;
+    font-weight: bold;
+    font-style: italic;
+    padding: 0;
+    margin: 15px 0 5px; }
+    dl dt:first-child {
+      padding: 0; }
+    dl dt > :first-child {
+      margin-top: 0; }
+    dl dt > :last-child {
+      margin-bottom: 0; }
+  dl dd {
+    margin: 0 0 15px;
+    padding: 0 15px; }
+    dl dd > :first-child {
+      margin-top: 0; }
+    dl dd > :last-child {
+      margin-bottom: 0; }
+
+blockquote {
+  border-left: 4px solid #dddddd;
+  padding: 0 15px;
+  color: #777777; }
+  blockquote > :first-child {
+    margin-top: 0; }
+  blockquote > :last-child {
+    margin-bottom: 0; }
+
+table {
+  padding: 0;border-collapse: collapse; }
+  table tr {
+    border-top: 1px solid #cccccc;
+    background-color: white;
+    margin: 0;
+    padding: 0; }
+    table tr:nth-child(2n) {
+      background-color: #f8f8f8; }
+    table tr th {
+      font-weight: bold;
+      border: 1px solid #cccccc;
+      margin: 0;
+      padding: 6px 13px; }
+    table tr td {
+      border: 1px solid #cccccc;
+      margin: 0;
+      padding: 6px 13px; }
+    table tr th :first-child, table tr td :first-child {
+      margin-top: 0; }
+    table tr th :last-child, table tr td :last-child {
+      margin-bottom: 0; }
+
+img {
+  max-width: 100%; }
+
+span.frame {
+  display: block;
+  overflow: hidden; }
+  span.frame > span {
+    border: 1px solid #dddddd;
+    display: block;
+    float: left;
+    overflow: hidden;
+    margin: 13px 0 0;
+    padding: 7px;
+    width: auto; }
+  span.frame span img {
+    display: block;
+    float: left; }
+  span.frame span span {
+    clear: both;
+    color: #333333;
+    display: block;
+    padding: 5px 0 0; }
+span.align-center {
+  display: block;
+  overflow: hidden;
+  clear: both; }
+  span.align-center > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px auto 0;
+    text-align: center; }
+  span.align-center span img {
+    margin: 0 auto;
+    text-align: center; }
+span.align-right {
+  display: block;
+  overflow: hidden;
+  clear: both; }
+  span.align-right > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px 0 0;
+    text-align: right; }
+  span.align-right span img {
+    margin: 0;
+    text-align: right; }
+span.float-left {
+  display: block;
+  margin-right: 13px;
+  overflow: hidden;
+  float: left; }
+  span.float-left span {
+    margin: 13px 0 0; }
+span.float-right {
+  display: block;
+  margin-left: 13px;
+  overflow: hidden;
+  float: right; }
+  span.float-right > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px auto 0;
+    text-align: right; }
+
+code, tt {
+  margin: 0 2px;
+  padding: 0 5px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px; }
+
+pre code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent; }
+
+.highlight pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+  pre code, pre tt {
+    background-color: transparent;
+    border: none; }
+
+sup {
+    font-size: 0.83em;
+    vertical-align: super;
+    line-height: 0;
+}
+* {
+	-webkit-print-color-adjust: exact;
+}
+@media screen and (min-width: 914px) {
+    body {
+        width: 854px;
+        margin:0 auto;
+    }
+}
+@media print {
+	table, pre {
+		page-break-inside: avoid;
+	}
+	pre {
+		word-wrap: break-word;
+	}
+}
+</style>
+</head>
+<body>
+<h1 id="toc_0">Scheme修行(6) letcc登場</h1>
+
+<h2 id="toc_1">第13章 ホップ、スキップ、ジャンプ</h2>
+
+<p>継続が出てきます。</p>
+
+<h2 id="toc_2">クローン</h2>
+
+<p>この章では<code>member?</code>を使います。
+<code>member?</code>は12章でも定義しましたが、あらためてutil.rktに定義を入れて使おうと思います。
+淡々と修正してもいいんですが、別の担当者のつもりでリポジトリをクローンしてみます。
+ひとつ上のディレクトリに移動し、seasonedschemer-utilというディレクトリにリポジトリをクローンします。</p>
+
+<pre class="line-numbers"><code class="language-none">$ cd ..
+$ git clone https://github.com/koba925/seasonedschemer seasonedschemer-util
+Cloning into &#39;seasonedschemer-util&#39;...
+remote: Counting objects: 95, done.
+remote: Compressing objects: 100% (42/42), done.
+remote: Total 95 (delta 22), reused 0 (delta 0), pack-reused 52
+Unpacking objects: 100% (95/95), done.
+Checking connectivity... done.
+$ cd seasonedschemer-util/
+$ ls -a
+.       .git        blogs       chap12.rkt
+..      .gitignore  chap11.rkt  util.rkt
+$ git l
+* f722ae7 (HEAD -&gt; master, origin/master, origin/HEAD) 「Scheme修行(5) 第12章 残り &amp; 第13の戒律」を追加 - Takahiro Kobayashi, 25 hours ago
+* 4ebdb46 「Scheme修行(4) 第12章 multirember &amp; 第12の戒律」を追加 - Takahiro Kobayashi, 25 hours ago
+* 5e2134b ev?、od?、sum-of-prefixes、scrambleを追加 - Takahiro Kobayashi, 25 hours ago</code></pre>
+
+<p>できました。util.rktを修正してコミットします。ブランチ作成は省略してmasterで作業しました。</p>
+
+<pre class="line-numbers"><code class="language-none">$ git s
+On branch master
+Your branch is up-to-date with &#39;origin/master&#39;.
+Changes not staged for commit:
+  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+  (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+
+    modified:   util.rkt
+$ git ac
+[master 1f9de67] util.rktにmember?を追加
+ 1 file changed, 16 insertions(+), 3 deletions(-)
+$ git l
+* 1f9de67 (HEAD -&gt; master) util.rktにmember?を追加 - Takahiro Kobayashi, 37 seconds ago
+* f722ae7 (origin/master, origin/HEAD) 「Scheme修行(5) 第12章 残り &amp; 第13の戒律」を追加 - Takahiro Kobayashi, 25 hours ago
+* 4ebdb46 「Scheme修行(4) 第12章 multirember &amp; 第12の戒律」を追加 - Takahiro Kobayashi, 25 hours ago</code></pre>
+
+<p>リモートにpushします。クローンしたのでリモートは指定不要。</p>
+
+<pre class="line-numbers"><code class="language-none">$ git push
+Counting objects: 3, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 479 bytes | 0 bytes/s, done.
+Total 3 (delta 2), reused 0 (delta 0)
+To https://github.com/koba925/seasonedschemer
+   f722ae7..1f9de67  master -&gt; master
+$ git l
+* 1f9de67 (HEAD -&gt; master, origin/master, origin/HEAD) util.rktにmember?を追加 - Takahiro Kobayashi, 2 minutes ago
+* f722ae7 「Scheme修行(5) 第12章 残り &amp; 第13の戒律」を追加 - Takahiro Kobayashi, 25 hours ago
+* 4ebdb46 「Scheme修行(4) 第12章 multirember &amp; 第12の戒律」を追加 - Takahiro Kobayashi, 25 hours ago</code></pre>
+
+<p>seasonedschemerディレクトリに戻ってgit fetchでリモートから修正を持ってきます。</p>
+
+<pre class="line-numbers"><code class="language-none">$ cd ..
+$ cd seasonedschemer
+$ git fetch
+remote: Counting objects: 3, done.
+remote: Compressing objects: 100% (1/1), done.
+remote: Total 3 (delta 2), reused 3 (delta 2), pack-reused 0
+Unpacking objects: 100% (3/3), done.
+From https://github.com/koba925/seasonedschemer
+   f722ae7..1f9de67  master     -&gt; origin/master
+$ git l
+* 1f9de67 (origin/master) util.rktにmember?を追加 - Takahiro Kobayashi, 3 minutes ago
+* f722ae7 (HEAD -&gt; chap13, tag: chap12, master) 「Scheme修行(5) 第12章 残り &amp; 第13の戒律」を追加 - Takahiro Kobayashi, 25 hours ago
+* 4ebdb46 「Scheme修行(4) 第12章 multirember &amp; 第12の戒律」を追加 - Takahiro Kobayashi, 25 hours ago</code></pre>
+
+<p>masterにマージします。</p>
+
+<pre class="line-numbers"><code class="language-none">$ git co master
+Switched to branch &#39;master&#39;
+Your branch is behind &#39;origin/master&#39; by 1 commit, and can be fast-forwarded.
+  (use &quot;git pull&quot; to update your local branch)
+$ git merge
+Updating f722ae7..1f9de67
+Fast-forward
+ util.rkt | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)</code></pre>
+
+<p>git pullとやると、fetchしてmergeしてというのを一度にやってくれるそうですが、fetchしてmergeするほうがおすすめだそうです。
+まだわかっていない部分も多いので盲目的に従っておきます。</p>
+
+<p>これで<code>member?</code>が使えるようになりました。
+最低限だとこんなところでしょうか？</p>
+
+<h2 id="toc_3">intersectall</h2>
+
+<p>題材は<code>intersectall</code>です。まずは<code>intersect</code>から。</p>
+
+<pre class="line-numbers"><code class="language-none">(define intersect
+  (lambda (set1 set2)
+    (cond ((null? set1) (quote ()))
+          ((member? (car set1) set2)
+           (cons (car set1) (intersect (cdr set1) set2)))
+          (else (intersect (cdr set1) set2)))))</code></pre>
+
+<p>第12の戒律を使って書き換えます。</p>
+
+<pre class="line-numbers"><code class="language-none">(define intersect
+  (lambda (set1 set2)
+    (letrec
+        ((I (lambda (set)
+              (cond ((null? set) (quote ()))
+                    ((member? (car set) set2)
+                     (cons (car set) (I (cdr set))))
+                    (else (I (cdr set)))))))
+      (I set1))))</code></pre>
+
+<h2 id="toc_4">過去のバージョンのファイルを見る</h2>
+
+<p>最初のバージョンの<code>intersect</code>を書いてコミットして書き換えてコミットして、とやると両方見たいときには少し不便です。
+古いバージョンを残したまま、あるいはコメントアウトして残しておくほうがお勉強中は便利かもしれません。
+書き換えてしまった部分を表示するには、git showでコミットとファイルを指定してやればいいようです。</p>
+
+<pre class="line-numbers"><code class="language-none">$ git show 8f0db0b:chap13.rkt
+:
+:
+(define intersect
+  (lambda (set1 set2)
+    (cond ((null? set1) (quote ()))
+          ((member? (car set1) set2)
+           (cons (car set1) (intersect (cdr set1) set2)))
+          (else (intersect (cdr set1) set2)))))
+:
+:
+$ git show 4a3f572:chap13.rkt
+:
+:
+(define intersect
+  (lambda (set1 set2)
+    (letrec
+        ((I (lambda (set)
+              (cond ((null? set) (quote ()))
+                    ((member? (car set) set2)
+                     (cons (car set) (I (cdr set))))
+                    (else (I (cdr set)))))))
+      (I set1))))
+:
+:</code></pre>
+
+<p>過去のファイルを指定して差分を表示することもできます。このへんを駆使すれば勉強もOKかなあ。</p>
+
+<pre class="line-numbers"><code class="language-none">$ git d 8f0db0b:chap13.rkt 4a3f572:chap13.rkt
+diff --git a/8f0db0b:chap13.rkt b/4a3f572:chap13.rkt
+index ecf98ab..166bc2c 100644
+--- a/8f0db0b:chap13.rkt
++++ b/4a3f572:chap13.rkt
+@@ -5,10 +5,13 @@
+
+ (define intersect
+   (lambda (set1 set2)
+-    (cond ((null? set1) (quote ()))
+-          ((member? (car set1) set2)
+-           (cons (car set1) (intersect (cdr set1) set2)))
+-          (else (intersect (cdr set1) set2)))))
++    (letrec
++        ((I (lambda (set)
++              (cond ((null? set) (quote ()))
++                    ((member? (car set) set2)
++                     (cons (car set) (I (cdr set))))
++                    (else (I (cdr set)))))))
++      (I set1))))</code></pre>
+
+<h2 id="toc_5">intersectall</h2>
+
+<p>以前に書いたバージョンです。</p>
+
+<pre class="line-numbers"><code class="language-none">(define intersectall
+  (lambda (lset)
+    (cond ((null? (cdr lset)) (car lset))
+          (else (intersect (car lset)
+                           (intersectall (cdr lset)))))))</code></pre>
+
+<p>このバージョンは、<code>lset</code>が<code>null?</code>でないという前提がありました。<code>null?</code>でもよいように書き換えます。</p>
+
+<pre class="line-numbers"><code class="language-none">(define intersectall
+  (lambda (lset)
+    (letrec
+        ((A (lambda (lset)
+              (cond ((null? (cdr lset)) (car lset))
+                    (else (intersect (car lset)
+                                     (A (cdr lset))))))))
+      (cond ((null? lset) (quote ()))
+            (else (A lset))))))</code></pre>
+
+<h2 id="toc_6">lambdaとletrecの違い</h2>
+
+<blockquote>
+<p>これ(<code>letrec</code>のこと)は<code>(lambda (x y) M)</code>と似ていますよね。</p>
+
+<p>はい、そうです。名前<code>x</code>と<code>y</code>は、<code>M</code>が何であろうと、<code>M</code>の内部でのみ有効です。そして<br>
+<code>(letrec ((x F) (y G)) M)</code><br>
+では、名前<code>x</code>と<code>y</code>は、<code>F</code>と<code>G</code>と<code>M</code>が何であろうと、<code>F</code>と<code>G</code>と<code>M</code>の内部でのみ有効です。</p>
+</blockquote>
+
+<h2 id="toc_7">letcc</h2>
+
+<p><code>(inersectall &#39;((3 mangoes and) () (3 diet hamburgers))</code>の値は<code>()</code>になります。<code>()</code>との共通部分を取っているので当然ですが、<code>intersectall</code>は正直に全部を<code>intersect</code>し続けます。
+<code>()</code>と出会ったらすぐ、今までやってきたことを放棄して<code>()</code>を返すようにします。</p>
+
+<p>というところで<code>letcc</code>の登場です。ただし、Racketでは<code>letcc</code>ではなく<code>let/cc</code>になっています。</p>
+
+<pre class="line-numbers"><code class="language-none">(define intersectall
+  (lambda (lset)
+    (let/cc hop
+      (letrec
+          ((A (lambda (lset)
+                (cond ((null? (car lset))
+                       (hop (quote ())))
+                      ((null? (cdr lset)) (car lset))
+                      (else (intersect (car lset)
+                                       (A (cdr lset))))))))
+        (cond ((null? lset) (quote()))
+              (else (A lset)))))))</code></pre>
+
+<p><code>A</code>の中で<code>(null? (car lset))</code>だった場合に<code>(hop (quote ())</code>を評価します。このとき何が起こるかというと</p>
+
+<blockquote>
+<p><code>(letcc hop</code>を通り過ぎた後、<code>(hop M)</code>に遭遇する前にすべきだったことを忘れなさい。そして、<code>M</code>が何であっても、まるで<code>(letcc hop M)</code>の値を求めたかのようにふるまいなさい。</p>
+</blockquote>
+
+<p>ということだそうです。
+この文章がいまひとつ飲み込めてなかったりします。</p>
+
+<ul>
+<li><code>(hop M)</code>の<code>M</code>と<code>(letcc hop M)</code>の<code>M</code>は同じなの？<br>
+コードと対応付けてみると<code>(hop M)</code>の<code>M</code>は<code>(quote ())</code>で、<code>(letcc hop M)</code>の<code>M</code>は<code>(letrec ...)</code>に見えます。そうじゃないとすれば両方<code>(quote ())</code>ってことなんでしょうけど。</li>
+<li><code>(letcc hop M)</code>の値を求めたかのようにふるまいなさいと言われても？<br>
+値は何なんですか？<code>M</code>なんでしょうけどそれなら「まるで<code>(letcc hop M)</code>の値は<code>M</code>であるかのように」と書けばよさそうなものですが・・・</li>
+</ul>
+
+<p>引っ掛かりはするものの、<code>(letcc hop M)</code>の値は<code>M</code>という理解で進みます。
+この評価が、実際に関数と同じ仕組みで行われているかはわかりませんが、同じように考えても問題はなさそうです。
+ひさしぶりに1ステップずつ評価を追ってみます。上の規則を踏まえるとこんな感じでしょうか。</p>
+
+<pre class="line-numbers"><code class="language-none">(intersectall-c &#39;((a b c) () (b e c)))
+(let/cc hop (A &#39;((a b c) () (b e c))))
+(let/cc hop (intersect &#39;(a b c) (A &#39;(() (b e c)))))
+(let/cc hop (intersect &#39;(a b c) (hop (quote ()))))
+(let/cc hop (quote ()))
+(quote ())</code></pre>
+
+<h2 id="toc_8">Alonzo Churchなら？</h2>
+
+<blockquote>
+<p>Alonzo Church (1903-1995) ならこう書いたでしょう。</p>
+
+<pre class="line-numbers"><code class="language-none">  :
+  (call-with-current-continuation
+    (lambda (hop)
+  :</code></pre>
+</blockquote>
+
+<p>なんだそうですが、Churchさんはコンピュータもない時代に継続まで考えてたってことでしょうか？
+どういう思考回路？と思いましたがさらっと検索した感じだと別にChurchが継続を発明したというわけではなさそうです。</p>
+
+<p>とすると何が言いたかったのか？</p>
+
+<h2 id="toc_9">第14の戒律</h2>
+
+<blockquote>
+<p><code>(letcc ...)</code>を用いて、値を直ちに、すばやく返すべし。</p>
+</blockquote>
+
+<h2 id="toc_10">さらにletcc</h2>
+
+<p><code>lset</code>に<code>()</code>が含まれていなくても、<code>intersect</code>した結果が<code>()</code>であれば<code>intersectall</code>の結果も<code>()</code>になります。その場合もすぐに結果を返すようにしたいものです。
+<code>intersect</code>を内部関数にして<code>hop</code>を共有できるようにし、<code>intersect</code>の処理から直接<code>intersectall</code>の結果を返すようにします。</p>
+
+<pre class="line-numbers"><code class="language-none">(define intersectall
+  (lambda (lset)
+    (let/cc hop
+      (letrec
+          ((A (lambda (lset)
+                (cond ((null? (car lset))
+                       (hop (quote ())))
+                      ((null? (cdr lset)) (car lset))
+                      (else (I (car lset) (A (cdr lset)))))))
+           (I (lambda (set1 set2)
+                (letrec
+                    ((J (lambda (set1)
+                          (cond ((null? set1) (quote ()))
+                                ((member? (car set1) set2)
+                                 (cons (car set1) (J (cdr set1))))
+                                (else (J (cdr set1)))))))
+                  (cond ((null? set2) (hop (quote ())))
+                        (else (J set1)))))))
+        (cond ((null? lset) (quote()))
+              (else (A lset)))))))</code></pre>
+
+<p>実行の様子。</p>
+
+<pre class="line-numbers"><code class="language-none">(intersectall &#39;((a b) (c d) (e f) (g h)))
+(let/cc hop (A &#39;((a b) (c d) (e f) (g h))))
+(let/cc hop (I &#39;(a b) (A &#39;((c d) (e f) (g h)))))
+(let/cc hop (I &#39;(a b) (I &#39;(c d) (A &#39;((e f) (g h))))))
+(let/cc hop (I &#39;(a b) (I &#39;(c d) (I &#39;(e f) (A &#39;((g h)))))))
+(let/cc hop (I &#39;(a b) (I &#39;(c d) (I &#39;(e f) &#39;(g h)))))
+(let/cc hop (I &#39;(a b) (I &#39;(c d) &#39;())))
+(let/cc hop (I &#39;(a b) (hop (quote ()))))
+(let/cc hop (quote ()))
+(quote ())</code></pre>
+
+<p>こういうのが思ったとおりに動いているかどうかは、こういうテストではわかりませんね。</p>
+
+<pre class="line-numbers"><code class="language-none">(check-equal? (intersectall &#39;((a b) (c d) (e f) (g h))) &#39;())</code></pre>
+
+<p>なにかいい方法はあるんでしょうか。</p>
+
+<p>ファーストクラスの継続、と言うくらいですから内部関数にする代わりに<code>hop</code>を渡すようにしても動くでしょうか？</p>
+
+<pre class="line-numbers"><code class="language-none">(define intersect2
+  (lambda (set1 set2 hop)
+    (letrec
+        ((I (lambda (set)
+              (cond ((null? set) (quote ()))
+                    ((member? (car set) set2)
+                     (cons (car set) (I (cdr set))))
+                    (else (I (cdr set)))))))
+      (cond ((null? set2) (hop (quote ())))
+            (else (I set1))))))
+
+(define intersectall2
+  (lambda (lset)
+    (let/cc hop
+      (letrec
+          ((A (lambda (lset)
+                (cond ((null? (car lset))
+                       (hop (quote ())))
+                      ((null? (cdr lset)) (car lset))
+                      (else (intersect2 (car lset) (A (cdr lset)) hop))))))
+        (cond ((null? lset) (quote()))
+              (else (A lset)))))))</code></pre>
+
+<p>動きました。</p>
+
+<h2 id="toc_11">今回覚えたgitコマンド</h2>
+
+<ul>
+<li>git clone</li>
+<li>git fetch</li>
+<li>git pull</li>
+<li>git show &lt;コミット&gt;:&lt;ファイル&gt;</li>
+<li>git diff &lt;コミット&gt;:&lt;ファイル&gt; &lt;コミット&gt;:&lt;ファイル&gt;</li>
+</ul>
+
+
+</body>
+
+</html>

@@ -166,20 +166,6 @@
 (check-equal? (multirember-r5 'a '(b c)) '(b c))
 (check-equal? (multirember-r5 'a '(a b a)) '(b))
 
-(letrec
-    ((ev? (lambda (n)
-            (cond ((zero? n) #t)
-                  (else (od? (sub1 n))))))
-     (od? (lambda (n)
-            (cond ((zero? n) #f)
-                  (else (ev? (sub1 n)))))))
-  (check-true (ev? 0))
-  (check-false (od? 0))
-  (check-false (ev? 1))
-  (check-true (od? 1))
-  (check-true (ev? 2))
-  (check-false (od? 2)))
-    
 (define member?
   (lambda (a lat)
     (cond ((null? lat) #f)
@@ -399,3 +385,18 @@
 (check-equal? (scramble '()) '())
 (check-equal? (scramble '(1)) '(1))
 (check-equal? (scramble '(1 1 1 3 4 2 1 1 9 2)) '(1 1 1 1 1 4 1 1 1 9))
+
+(letrec
+    ((ev? (lambda (n)
+            (cond ((zero? n) #t)
+                  (else (od? (sub1 n))))))
+     (od? (lambda (n)
+            (cond ((zero? n) #f)
+                  (else (ev? (sub1 n)))))))
+  (check-true (ev? 0))
+  (check-false (od? 0))
+  (check-false (ev? 1))
+  (check-true (od? 1))
+  (check-true (ev? 2))
+  (check-false (od? 2)))
+    
