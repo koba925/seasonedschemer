@@ -1,0 +1,551 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer08</title>
+<style type="text/css">
+body {
+  font-family: Helvetica, arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: white;
+  padding: 30px; }
+
+body > *:first-child {
+  margin-top: 0 !important; }
+body > *:last-child {
+  margin-bottom: 0 !important; }
+
+a {
+  color: #4183C4; }
+a.absent {
+  color: #cc0000; }
+a.anchor {
+  display: block;
+  padding-left: 30px;
+  margin-left: -30px;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0; }
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 20px 0 10px;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+  cursor: text;
+  position: relative; }
+
+h1:hover a.anchor, h2:hover a.anchor, h3:hover a.anchor, h4:hover a.anchor, h5:hover a.anchor, h6:hover a.anchor {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA09pVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoMTMuMCAyMDEyMDMwNS5tLjQxNSAyMDEyLzAzLzA1OjIxOjAwOjAwKSAgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OUM2NjlDQjI4ODBGMTFFMTg1ODlEODNERDJBRjUwQTQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OUM2NjlDQjM4ODBGMTFFMTg1ODlEODNERDJBRjUwQTQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo5QzY2OUNCMDg4MEYxMUUxODU4OUQ4M0REMkFGNTBBNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo5QzY2OUNCMTg4MEYxMUUxODU4OUQ4M0REMkFGNTBBNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PsQhXeAAAABfSURBVHjaYvz//z8DJYCRUgMYQAbAMBQIAvEqkBQWXI6sHqwHiwG70TTBxGaiWwjCTGgOUgJiF1J8wMRAIUA34B4Q76HUBelAfJYSA0CuMIEaRP8wGIkGMA54bgQIMACAmkXJi0hKJQAAAABJRU5ErkJggg==) no-repeat 10px center;
+  text-decoration: none; }
+
+h1 tt, h1 code {
+  font-size: inherit; }
+
+h2 tt, h2 code {
+  font-size: inherit; }
+
+h3 tt, h3 code {
+  font-size: inherit; }
+
+h4 tt, h4 code {
+  font-size: inherit; }
+
+h5 tt, h5 code {
+  font-size: inherit; }
+
+h6 tt, h6 code {
+  font-size: inherit; }
+
+h1 {
+  font-size: 28px;
+  color: black; }
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #cccccc;
+  color: black; }
+
+h3 {
+  font-size: 18px; }
+
+h4 {
+  font-size: 16px; }
+
+h5 {
+  font-size: 14px; }
+
+h6 {
+  color: #777777;
+  font-size: 14px; }
+
+p, blockquote, ul, ol, dl, li, table, pre {
+  margin: 15px 0; }
+
+hr {
+  background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAECAYAAACtBE5DAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OENDRjNBN0E2NTZBMTFFMEI3QjRBODM4NzJDMjlGNDgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OENDRjNBN0I2NTZBMTFFMEI3QjRBODM4NzJDMjlGNDgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo4Q0NGM0E3ODY1NkExMUUwQjdCNEE4Mzg3MkMyOUY0OCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo4Q0NGM0E3OTY1NkExMUUwQjdCNEE4Mzg3MkMyOUY0OCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PqqezsUAAAAfSURBVHjaYmRABcYwBiM2QSA4y4hNEKYDQxAEAAIMAHNGAzhkPOlYAAAAAElFTkSuQmCC) repeat-x 0 0;
+  border: 0 none;
+  color: #cccccc;
+  height: 4px;
+  padding: 0;
+}
+
+body > h2:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+body > h1:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+  body > h1:first-child + h2 {
+    margin-top: 0;
+    padding-top: 0; }
+body > h3:first-child, body > h4:first-child, body > h5:first-child, body > h6:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0; }
+
+h1 p, h2 p, h3 p, h4 p, h5 p, h6 p {
+  margin-top: 0; }
+
+li p.first {
+  display: inline-block; }
+li {
+  margin: 0; }
+ul, ol {
+  padding-left: 30px; }
+
+ul :first-child, ol :first-child {
+  margin-top: 0; }
+
+dl {
+  padding: 0; }
+  dl dt {
+    font-size: 14px;
+    font-weight: bold;
+    font-style: italic;
+    padding: 0;
+    margin: 15px 0 5px; }
+    dl dt:first-child {
+      padding: 0; }
+    dl dt > :first-child {
+      margin-top: 0; }
+    dl dt > :last-child {
+      margin-bottom: 0; }
+  dl dd {
+    margin: 0 0 15px;
+    padding: 0 15px; }
+    dl dd > :first-child {
+      margin-top: 0; }
+    dl dd > :last-child {
+      margin-bottom: 0; }
+
+blockquote {
+  border-left: 4px solid #dddddd;
+  padding: 0 15px;
+  color: #777777; }
+  blockquote > :first-child {
+    margin-top: 0; }
+  blockquote > :last-child {
+    margin-bottom: 0; }
+
+table {
+  padding: 0;border-collapse: collapse; }
+  table tr {
+    border-top: 1px solid #cccccc;
+    background-color: white;
+    margin: 0;
+    padding: 0; }
+    table tr:nth-child(2n) {
+      background-color: #f8f8f8; }
+    table tr th {
+      font-weight: bold;
+      border: 1px solid #cccccc;
+      margin: 0;
+      padding: 6px 13px; }
+    table tr td {
+      border: 1px solid #cccccc;
+      margin: 0;
+      padding: 6px 13px; }
+    table tr th :first-child, table tr td :first-child {
+      margin-top: 0; }
+    table tr th :last-child, table tr td :last-child {
+      margin-bottom: 0; }
+
+img {
+  max-width: 100%; }
+
+span.frame {
+  display: block;
+  overflow: hidden; }
+  span.frame > span {
+    border: 1px solid #dddddd;
+    display: block;
+    float: left;
+    overflow: hidden;
+    margin: 13px 0 0;
+    padding: 7px;
+    width: auto; }
+  span.frame span img {
+    display: block;
+    float: left; }
+  span.frame span span {
+    clear: both;
+    color: #333333;
+    display: block;
+    padding: 5px 0 0; }
+span.align-center {
+  display: block;
+  overflow: hidden;
+  clear: both; }
+  span.align-center > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px auto 0;
+    text-align: center; }
+  span.align-center span img {
+    margin: 0 auto;
+    text-align: center; }
+span.align-right {
+  display: block;
+  overflow: hidden;
+  clear: both; }
+  span.align-right > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px 0 0;
+    text-align: right; }
+  span.align-right span img {
+    margin: 0;
+    text-align: right; }
+span.float-left {
+  display: block;
+  margin-right: 13px;
+  overflow: hidden;
+  float: left; }
+  span.float-left span {
+    margin: 13px 0 0; }
+span.float-right {
+  display: block;
+  margin-left: 13px;
+  overflow: hidden;
+  float: right; }
+  span.float-right > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px auto 0;
+    text-align: right; }
+
+code, tt {
+  margin: 0 2px;
+  padding: 0 5px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px; }
+
+pre code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent; }
+
+.highlight pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+  pre code, pre tt {
+    background-color: transparent;
+    border: none; }
+
+sup {
+    font-size: 0.83em;
+    vertical-align: super;
+    line-height: 0;
+}
+* {
+	-webkit-print-color-adjust: exact;
+}
+@media screen and (min-width: 914px) {
+    body {
+        width: 854px;
+        margin:0 auto;
+    }
+}
+@media print {
+	table, pre {
+		page-break-inside: avoid;
+	}
+	pre {
+		word-wrap: break-word;
+	}
+}
+</style>
+</head>
+<body>
+<h1 id="toc_0">Scheme修行(8) let</h1>
+
+<h2 id="toc_1">第14章 名前をつけましょう</h2>
+
+<p>この章ではletを覚えます。
+letをletrecより後でとりあげたのはどういうことなんでしょう？</p>
+
+<h2 id="toc_2">コンフリクトの解消</h2>
+
+<p>訳あって13章と14章をそれぞれのブランチで並行して作業してたんですが、13章が終わったので14章のブランチに13章の内容をマージしようとしたところ</p>
+
+<pre class="line-numbers"><code class="language-none">$ git co chap14
+Switched to branch &#39;chap14&#39;
+$ git merge master
+Auto-merging util.rkt
+CONFLICT (content): Merge conflict in util.rkt
+Automatic merge failed; fix conflicts and then commit the result.</code></pre>
+
+<p>出やがったなコンフリクト！</p>
+
+<p>どれどれ。</p>
+
+<pre class="line-numbers"><code class="language-none">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+(provide atom? add1 sub1 one? eqlist? pick member? Y)
+=======
+(provide atom? add1 sub1 one? pick member? reverse Y)
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; master</code></pre>
+
+<p>ああそこね。修正。</p>
+
+<pre class="line-numbers"><code class="language-none">(provide atom? add1 sub1 one? eqlist? pick member? reverse Y)</code></pre>
+
+<p>どれ。</p>
+
+<pre class="line-numbers"><code class="language-none">$ git s
+On branch chap14
+You have unmerged paths.
+  (fix conflicts and run &quot;git commit&quot;)
+
+Changes to be committed:
+
+    new file:   blogs/seasonedschemer06.html
+    new file:   blogs/seasonedschemer06.md
+    new file:   blogs/seasonedschemer07.html
+    new file:   blogs/seasonedschemer07.md
+    modified:   chap12.rkt
+    new file:   chap13.rkt
+
+Unmerged paths:
+  (use &quot;git add &lt;file&gt;...&quot; to mark resolution)
+
+    both modified:   util.rkt
+
+$ git d
+diff --cc util.rkt
+index 8b2a555,848411c..0000000
+--- a/util.rkt
++++ b/util.rkt
+@@@ -2,7 -2,7 +2,7 @@@
+  
+  (require rackunit)
+  
+- (provide atom? add1 sub1 one? eqlist? pick member? Y)
+ -(provide atom? add1 sub1 one? pick member? reverse Y)
+++(provide atom? add1 sub1 one? eqlist? pick member? reverse Y)</code></pre>
+
+<p>diffの結果はこんな風に表示されるのかー。</p>
+
+<p>コンフリフトを解消したらaddしてcommitする、と。</p>
+
+<pre class="line-numbers"><code class="language-none">$ git commit
+[chap14 5a32265] Merge branch &#39;master&#39; into chap14
+$ git l5
+*   5a32265 (HEAD -&gt; chap14) Merge branch &#39;master&#39; into chap14 - Takahiro ...
+|\  
+| * 142771f (tag: chap13, origin/master, master, chap13) 「Scheme修行(7) ...
+| * 17ff612 rember-upto-lastのバリエーションを追加 - Takahiro Kobayashi, ...
+| * 0cff06a 「Scheme修行(6) letcc登場」を追加 - Takahiro Kobayashi, 4 ...
+| * faa8b64 intersectall hopを渡す版 - Takahiro Kobayashi, 4 days ago</code></pre>
+
+<p>準備完了。</p>
+
+<h2 id="toc_3">leftmost</h2>
+
+<p>一番左のアトムを探す<code>leftmost</code>です。</p>
+
+<pre class="line-numbers"><code class="language-none">(define leftmost
+  (lambda (l)
+    (cond ((atom? (car l)) (car l))
+          (else (leftmost (car l))))))</code></pre>
+
+<p>これは引数に空リストを含まないことが前提になっているので、空リストを含んでいてもよいようにしてやります。</p>
+
+<pre class="line-numbers"><code class="language-none">(define leftmost2
+  (lambda (l)
+    (cond ((null? l) (quote ()))
+          ((atom? (car l)) (car l))
+          (else (cond
+                  ((atom? (leftmost2 (car l)))
+                   (leftmost2 (car l)))
+                  (else (leftmost2 (cdr l))))))))</code></pre>
+
+<p><code>(null? l)</code>だったときに<code>()</code>を返しているのは、たとえば<code>#f</code>を返すようにすると一番左のアトムが<code>#f</code>だった場合と区別がつかないからです。</p>
+
+<p><code>cond</code>の中の<code>((atom? (leftmost2 (car l))) (leftmost2 (car l)))</code>で、<code>(leftmost2 (car l))</code>を2回評価しているのがもったいないですね。</p>
+
+<blockquote>
+<p>そのような望ましくない繰り返しを防ぐために、<code>(letrec ...)</code>を用いてみましょう。</p>
+
+<p>はい。でも、<code>(letrec ...)</code>で好きなものに名前をつけるのですか？</p>
+
+<p>代わりに<code>(let ...)</code>を使います。</p>
+</blockquote>
+
+<p>というわけでこうなります。</p>
+
+<pre class="line-numbers"><code class="language-none">(define leftmost3
+  (lambda (l)
+    (cond
+      ((null? l) (quote ()))
+      ((atom? (car l)) (car l))
+      (else
+       (let ((a (leftmost3 (car l))))
+         (cond
+           ((atom? a) a)
+           (else (leftmost3 (cdr l)))))))))</code></pre>
+
+<p>わからないのはこれ。</p>
+
+<blockquote>
+<p><code>(letrec ...)</code>と見かけは同じですが、<code>(let ...)</code>は式の値に名前をつけるのです。</p>
+</blockquote>
+
+<p><code>letrec</code>だって式の値に名前をつけてるんじゃないかと。
+違いは名前の見えてるスコープだけだと思ってたんですが・・・</p>
+
+<h2 id="toc_4">rember1*</h2>
+
+<p>rember*はS式から指定したアトムをすべて取り除くものでしたが、最初に見つかったアトムだけを削除する関数を作ります。</p>
+
+<pre class="line-numbers"><code class="language-none">(define rember1*
+  (lambda (a l)
+    (letrec
+        ((R (lambda (l)
+              (cond
+                ((null? l) (quote ()))
+                ((atom? (car l))
+                 (cond
+                   ((eq? (car l) a) (cdr l))
+                   (else (cons (car l) (R (cdr l))))))
+                (else
+                 (cond
+                   ((eqlist? (R (car l)) (car l))
+                    (cons (car l) (R (cdr l))))
+                   (else
+                    (cons (R (car l)) (cdr l)))))))))
+      (R l))))</code></pre>
+
+<p><code>(eqlist? (R (car l)) (car l))</code>という条件は、「carにaが含まれていなければ」という意味ですね。</p>
+
+<p><code>(R (car l))</code>が2回呼ばれていますので<code>let</code>で書き直します。</p>
+
+<pre class="line-numbers"><code class="language-none">(define rember1*3
+  (lambda (a l)
+    (letrec
+        ((R (lambda (l)
+              (cond
+:
+:
+                (else
+                 (let ((av (R (car l))))
+                   (cond
+                     ((eqlist? av (car l))
+                      (cons (car l) (R (cdr l))))
+                     (else
+                      (cons av (cdr l))))))))))
+      (R l))))</code></pre>
+
+<h2 id="toc_5">第15の戒律(仮)</h2>
+
+<blockquote>
+<p>繰り返される式の値に名づくるには<code>(let ...)</code>を用うべし。</p>
+</blockquote>
+
+<h2 id="toc_6">depth*</h2>
+
+<p>リストの深さを求める<code>depth*</code>です。</p>
+
+<pre class="line-numbers"><code class="language-none">(define depth*
+  (lambda (l)
+    (cond ((null? l) 1)
+          ((atom? (car l)) (depth* (cdr l)))
+          (else (cond ((&gt; (depth* (cdr l))
+                          (add1 (depth* (car l))))
+                       (depth* (cdr l)))
+                      (else
+                       (add1 (depth* (car l)))))))))</code></pre>
+
+<p><code>(depth* (cdr l))</code> と<code>(add1 (depth* (car l)))</code>が2回ずつ出てきます。</p>
+
+<p>letで書きます。</p>
+
+<pre class="line-numbers"><code class="language-none">(define depth*2
+  (lambda (l)
+    (cond
+      ((null? l) 1)
+      ((atom? (car l)) (depth*2 (cdr l)))
+      (else
+       (let ((a (add1 (depth*2 (car l))))
+             (d (depth*2 (cdr l))))
+         (cond ((&gt; d a) d)
+               (else a)))))))</code></pre>
+
+<p>よく見るとまだ<code>(depth* (cdr l))</code>が2回出てきてますね。こうすべきでしょうか？</p>
+
+<pre class="line-numbers"><code class="language-none">(define depth*3
+  (lambda (l)
+    (cond
+      ((null? l) 1)
+      (else
+       (let ((d (depth*3 (cdr l))))
+         (cond
+           ((atom? (car l)) d)
+           (else
+            (let ((a (add1 (depth*3 (car l)))))
+              (cond
+                ((&gt; d a) d)
+                (else a))))))))))</code></pre>
+
+<p>こうすると確かに<code>(depth* (cdr l))</code>を繰り返し書かなくてすむようになりましたが、<code>(depth* (cdr l))</code>を評価する回数は実は変わっていません。
+そのわりに、コードの方は<code>cond</code>と<code>let</code>の入れ子で読みづらくなっています。
+ちょっとこれはやり過ぎだったようです。
+DRY原則的には3つ目の方がよいところもありますが。</p>
+
+<h2 id="toc_7">第15の戒律(改訂版)</h2>
+
+<blockquote>
+<p>関数定義において繰り返される式は、当の関数を1回使用するときに2回評価される可能性があるなら、
+それらの値を名付くるに<code>(let ...)</code>を用うべし。</p>
+</blockquote>
+
+
+</body>
+
+</html>
