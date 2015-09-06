@@ -257,3 +257,125 @@
 (check-equal? (scramble '()) '())
 (check-equal? (scramble '(1)) '(1))
 (check-equal? (scramble '(1 1 1 3 4 2 1 1 9 2)) '(1 1 1 1 1 4 1 1 1 9))
+
+(define leftmost4
+  (lambda (l)
+    (let/cc skip
+      (cond
+        ((null? l) (quote ()))
+        ((atom? (car l)) (car l))
+        (else
+         (let ((a (leftmost4 (car l))))
+           (cond
+             ((atom? a) (skip a))
+             (else (leftmost4 (cdr l))))))))))
+
+(check-equal? (leftmost4 '()) '())
+(check-equal? (leftmost4 '(a)) 'a)
+(check-equal? (leftmost4 '(a b)) 'a)
+(check-equal? (leftmost4 '((a) b)) 'a)
+(check-equal? (leftmost4 '(() (a) b)) 'a)
+(check-equal? (leftmost4 '((()) (a) b)) 'a)
+(check-equal? (leftmost4 '((()) (() a) b)) 'a)
+
+(define leftmost5
+  (lambda (l)
+    (let/cc skip
+      (letrec
+          ((lm (lambda (l)
+                 (cond
+                   ((null? l) (quote ()))
+                   ((atom? (car l)) (skip (car l)))
+                   (else
+                    (let ((a (lm (car l))))
+                      (cond
+                        ((atom? a) a)
+                        (else (lm (cdr l))))))))))
+        (lm l)))))
+        
+(check-equal? (leftmost5 '()) '())
+(check-equal? (leftmost5 '(a)) 'a)
+(check-equal? (leftmost5 '(a b)) 'a)
+(check-equal? (leftmost5 '((a) b)) 'a)
+(check-equal? (leftmost5 '(() (a) b)) 'a)
+(check-equal? (leftmost5 '((()) (a) b)) 'a)
+(check-equal? (leftmost5 '((()) (() a) b)) 'a)
+
+(define leftmost6
+  (lambda (l)
+    (let/cc skip
+      (lm l skip))))
+
+(define lm
+  (lambda (l out)
+    (cond ((null? l) (quote ()))
+          ((atom? (car l)) (out (car l)))
+          (else (let ()
+                  (lm (car l) out))
+                  (lm (cdr l) out)))))
+
+(check-equal? (leftmost6 '()) '())
+(check-equal? (leftmost6 '(a)) 'a)
+(check-equal? (leftmost6 '(a b)) 'a)
+(check-equal? (leftmost6 '((a) b)) 'a)
+(check-equal? (leftmost6 '(() (a) b)) 'a)
+(check-equal? (leftmost6 '((()) (a) b)) 'a)
+(check-equal? (leftmost6 '((()) (() a) b)) 'a)
+
+(define leftmost7
+  (lambda (l)
+    (let/cc skip
+      (letrec
+          ((lm (lambda (l)
+                 (cond ((null? l) (quote ()))
+                       ((atom? (car l)) (skip (car l)))
+                       (else (let ()
+                               (lm (car l))
+                               (lm (cdr l))))))))
+        (lm l)))))
+
+(check-equal? (leftmost7 '()) '())
+(check-equal? (leftmost7 '(a)) 'a)
+(check-equal? (leftmost7 '(a b)) 'a)
+(check-equal? (leftmost7 '((a) b)) 'a)
+(check-equal? (leftmost7 '(() (a) b)) 'a)
+(check-equal? (leftmost7 '((()) (a) b)) 'a)
+(check-equal? (leftmost7 '((()) (() a) b)) 'a)
+
+(define leftmost8
+  (lambda (l)
+    (let/cc skip
+      (letrec
+          ((lm (lambda (l)
+                 (cond ((null? l) (quote ()))
+                       ((atom? (car l)) (skip (car l)))
+                       (else 
+                        (lm (car l))
+                        (lm (cdr l)))))))
+        (lm l)))))
+
+(check-equal? (leftmost8 '()) '())
+(check-equal? (leftmost8 '(a)) 'a)
+(check-equal? (leftmost8 '(a b)) 'a)
+(check-equal? (leftmost8 '((a) b)) 'a)
+(check-equal? (leftmost8 '(() (a) b)) 'a)
+(check-equal? (leftmost8 '((()) (a) b)) 'a)
+(check-equal? (leftmost8 '((()) (() a) b)) 'a)
+
+(define rm
+  (lambda (a l oh)
+    (cond
+      ((null? l) (oh (quote no)))
+      ((atom? (car l))
+       (if (eq? (car l) a)
+           (cdr l)
+           (cons (car l) (rm a (cdr l) oh))))
+      (else
+       (if (atom? 
+            (let/cc oh
+              (rm a (car l) oh)))
+           (cons (car l) (rm a (cdr l) oh))
+           (cons (rm a (car l) 0) (cdr l)))))))
+
+            
+
