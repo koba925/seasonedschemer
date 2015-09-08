@@ -377,5 +377,77 @@
            (cons (car l) (rm a (cdr l) oh))
            (cons (rm a (car l) 0) (cdr l)))))))
 
-            
+;(let/cc Say (rm 'a '((b) c (b)) Say))
+;(let/cc Say (if (atom? (let/cc oh (rm 'a '(b) oh))) ...))
+;(let/cc Say (if (atom? (let/cc oh (cons 'b (rm 'a '() oh)))) ...))
+;(let/cc Say (if (atom? (let/cc oh (cons 'a (oh 'no)))) ...))
+;(let/cc Say (if (atom? 'no) ...))
+;(let/cc Say (cons '(b) (rm 'a '(c (b)) Say)))
+;(let/cc Say (cons '(b) (cons 'c (rm 'a '((b)) Say))))
+;(let/cc Say (cons '(b) (cons 'c (if (atom? (let/cc oh (rm 'a '() oh))) ...))))
+;(let/cc Say (cons '(b) (cons 'c (if (atom? 'no) ...))))
+;(let/cc Say (cons '(b) (cons 'c (cons '(b) (rm 'a '() Say)))))
+;(let/cc Say (cons '(b) (cons 'c (cons '(b) (Say 'no)))))
+;'no
 
+(define rember1*4
+  (lambda (a l)
+    (if (atom? (let/cc oh (rm a l oh)))
+        l
+        (rm a l (quote ())))))
+
+(check-equal? (rember1*4 'a '()) '())
+(check-equal? (rember1*4 'a '(a)) '())
+(check-equal? (rember1*4 'a '(b)) '(b))
+(check-equal? (rember1*4 'a '((a) b a)) '(() b a))
+(check-equal? (rember1*4 'a '((b) b a)) '((b) b))
+
+(define rember1*5
+  (lambda (a l)
+    (let ((new-l (let/cc oh (rm5 a l oh))))
+      (if (atom? new-l)
+          l
+          new-l))))
+  
+(define rm5
+  (lambda (a l oh)
+    (cond
+      ((null? l) (oh (quote no)))
+      ((atom? (car l))
+       (if (eq? (car l) a)
+           (cdr l)
+           (cons (car l) (rm5 a (cdr l) oh))))
+      (else
+       (let ((new-car (let/cc oh (rm5 a (car l) oh))))
+         (if (atom? new-car)
+             (cons (car l) (rm5 a (cdr l) oh))
+             (cons new-car (cdr l))))))))
+
+(check-equal? (rember1*5 'a '()) '())
+(check-equal? (rember1*5 'a '(a)) '())
+(check-equal? (rember1*5 'a '(b)) '(b))
+(check-equal? (rember1*5 'a '((a) b a)) '(() b a))
+(check-equal? (rember1*5 'a '((b) b a)) '((b) b))
+
+(define rember1*6
+  (lambda (a l)
+    (try oh (rm5 a l oh) l)))
+
+(define rm6
+  (lambda (a l oh)
+    (cond
+      ((null? l) (oh (quote no)))
+      ((atom? (car l))
+       (if (eq? (car l) a)
+           (cdr l)
+           (cons (car l) (rm6 a (cdr l) oh))))
+      (else
+       (try oh2
+            (cons (rm6 a (car l) oh2) (cdr l))
+            (cons (car l) (rm6 a (cdr l) oh)))))))
+
+(check-equal? (rember1*6 'a '()) '())
+(check-equal? (rember1*6 'a '(a)) '())
+(check-equal? (rember1*6 'a '(b)) '(b))
+(check-equal? (rember1*6 'a '((a) b a)) '(() b a))
+(check-equal? (rember1*6 'a '((b) b a)) '((b) b))

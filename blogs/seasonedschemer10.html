@@ -1,0 +1,568 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer10</title>
+<style type="text/css">
+body {
+  font-family: Helvetica, arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: white;
+  padding: 30px; }
+
+body > *:first-child {
+  margin-top: 0 !important; }
+body > *:last-child {
+  margin-bottom: 0 !important; }
+
+a {
+  color: #4183C4; }
+a.absent {
+  color: #cc0000; }
+a.anchor {
+  display: block;
+  padding-left: 30px;
+  margin-left: -30px;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0; }
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 20px 0 10px;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+  cursor: text;
+  position: relative; }
+
+h1:hover a.anchor, h2:hover a.anchor, h3:hover a.anchor, h4:hover a.anchor, h5:hover a.anchor, h6:hover a.anchor {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA09pVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoMTMuMCAyMDEyMDMwNS5tLjQxNSAyMDEyLzAzLzA1OjIxOjAwOjAwKSAgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OUM2NjlDQjI4ODBGMTFFMTg1ODlEODNERDJBRjUwQTQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OUM2NjlDQjM4ODBGMTFFMTg1ODlEODNERDJBRjUwQTQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo5QzY2OUNCMDg4MEYxMUUxODU4OUQ4M0REMkFGNTBBNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo5QzY2OUNCMTg4MEYxMUUxODU4OUQ4M0REMkFGNTBBNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PsQhXeAAAABfSURBVHjaYvz//z8DJYCRUgMYQAbAMBQIAvEqkBQWXI6sHqwHiwG70TTBxGaiWwjCTGgOUgJiF1J8wMRAIUA34B4Q76HUBelAfJYSA0CuMIEaRP8wGIkGMA54bgQIMACAmkXJi0hKJQAAAABJRU5ErkJggg==) no-repeat 10px center;
+  text-decoration: none; }
+
+h1 tt, h1 code {
+  font-size: inherit; }
+
+h2 tt, h2 code {
+  font-size: inherit; }
+
+h3 tt, h3 code {
+  font-size: inherit; }
+
+h4 tt, h4 code {
+  font-size: inherit; }
+
+h5 tt, h5 code {
+  font-size: inherit; }
+
+h6 tt, h6 code {
+  font-size: inherit; }
+
+h1 {
+  font-size: 28px;
+  color: black; }
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #cccccc;
+  color: black; }
+
+h3 {
+  font-size: 18px; }
+
+h4 {
+  font-size: 16px; }
+
+h5 {
+  font-size: 14px; }
+
+h6 {
+  color: #777777;
+  font-size: 14px; }
+
+p, blockquote, ul, ol, dl, li, table, pre {
+  margin: 15px 0; }
+
+hr {
+  background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAECAYAAACtBE5DAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OENDRjNBN0E2NTZBMTFFMEI3QjRBODM4NzJDMjlGNDgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OENDRjNBN0I2NTZBMTFFMEI3QjRBODM4NzJDMjlGNDgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo4Q0NGM0E3ODY1NkExMUUwQjdCNEE4Mzg3MkMyOUY0OCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo4Q0NGM0E3OTY1NkExMUUwQjdCNEE4Mzg3MkMyOUY0OCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PqqezsUAAAAfSURBVHjaYmRABcYwBiM2QSA4y4hNEKYDQxAEAAIMAHNGAzhkPOlYAAAAAElFTkSuQmCC) repeat-x 0 0;
+  border: 0 none;
+  color: #cccccc;
+  height: 4px;
+  padding: 0;
+}
+
+body > h2:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+body > h1:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+  body > h1:first-child + h2 {
+    margin-top: 0;
+    padding-top: 0; }
+body > h3:first-child, body > h4:first-child, body > h5:first-child, body > h6:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0; }
+
+h1 p, h2 p, h3 p, h4 p, h5 p, h6 p {
+  margin-top: 0; }
+
+li p.first {
+  display: inline-block; }
+li {
+  margin: 0; }
+ul, ol {
+  padding-left: 30px; }
+
+ul :first-child, ol :first-child {
+  margin-top: 0; }
+
+dl {
+  padding: 0; }
+  dl dt {
+    font-size: 14px;
+    font-weight: bold;
+    font-style: italic;
+    padding: 0;
+    margin: 15px 0 5px; }
+    dl dt:first-child {
+      padding: 0; }
+    dl dt > :first-child {
+      margin-top: 0; }
+    dl dt > :last-child {
+      margin-bottom: 0; }
+  dl dd {
+    margin: 0 0 15px;
+    padding: 0 15px; }
+    dl dd > :first-child {
+      margin-top: 0; }
+    dl dd > :last-child {
+      margin-bottom: 0; }
+
+blockquote {
+  border-left: 4px solid #dddddd;
+  padding: 0 15px;
+  color: #777777; }
+  blockquote > :first-child {
+    margin-top: 0; }
+  blockquote > :last-child {
+    margin-bottom: 0; }
+
+table {
+  padding: 0;border-collapse: collapse; }
+  table tr {
+    border-top: 1px solid #cccccc;
+    background-color: white;
+    margin: 0;
+    padding: 0; }
+    table tr:nth-child(2n) {
+      background-color: #f8f8f8; }
+    table tr th {
+      font-weight: bold;
+      border: 1px solid #cccccc;
+      margin: 0;
+      padding: 6px 13px; }
+    table tr td {
+      border: 1px solid #cccccc;
+      margin: 0;
+      padding: 6px 13px; }
+    table tr th :first-child, table tr td :first-child {
+      margin-top: 0; }
+    table tr th :last-child, table tr td :last-child {
+      margin-bottom: 0; }
+
+img {
+  max-width: 100%; }
+
+span.frame {
+  display: block;
+  overflow: hidden; }
+  span.frame > span {
+    border: 1px solid #dddddd;
+    display: block;
+    float: left;
+    overflow: hidden;
+    margin: 13px 0 0;
+    padding: 7px;
+    width: auto; }
+  span.frame span img {
+    display: block;
+    float: left; }
+  span.frame span span {
+    clear: both;
+    color: #333333;
+    display: block;
+    padding: 5px 0 0; }
+span.align-center {
+  display: block;
+  overflow: hidden;
+  clear: both; }
+  span.align-center > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px auto 0;
+    text-align: center; }
+  span.align-center span img {
+    margin: 0 auto;
+    text-align: center; }
+span.align-right {
+  display: block;
+  overflow: hidden;
+  clear: both; }
+  span.align-right > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px 0 0;
+    text-align: right; }
+  span.align-right span img {
+    margin: 0;
+    text-align: right; }
+span.float-left {
+  display: block;
+  margin-right: 13px;
+  overflow: hidden;
+  float: left; }
+  span.float-left span {
+    margin: 13px 0 0; }
+span.float-right {
+  display: block;
+  margin-left: 13px;
+  overflow: hidden;
+  float: right; }
+  span.float-right > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px auto 0;
+    text-align: right; }
+
+code, tt {
+  margin: 0 2px;
+  padding: 0 5px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px; }
+
+pre code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent; }
+
+.highlight pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+  pre code, pre tt {
+    background-color: transparent;
+    border: none; }
+
+sup {
+    font-size: 0.83em;
+    vertical-align: super;
+    line-height: 0;
+}
+* {
+	-webkit-print-color-adjust: exact;
+}
+@media screen and (min-width: 914px) {
+    body {
+        width: 854px;
+        margin:0 auto;
+    }
+}
+@media print {
+	table, pre {
+		page-break-inside: avoid;
+	}
+	pre {
+		word-wrap: break-word;
+	}
+}
+</style>
+</head>
+<body>
+<h1 id="toc_0">Scheme修行(10) 例外処理(なの？)</h1>
+
+<h2 id="toc_1">今日のお題</h2>
+
+<p><code>rember1*</code>をいじっていきます。再掲。</p>
+
+<pre class="line-numbers"><code class="language-none">(define rember1*
+  (lambda (a l)
+    (letrec
+        ((R (lambda (l)
+              (cond
+                ((null? l) (quote ()))
+                ((atom? (car l))
+                 (cond
+                   ((eq? (car l) a) (cdr l))
+                   (else (cons (car l) (R (cdr l))))))
+                (else
+                 (let ((av (R (car l))))
+                   (cond
+                     ((eqlist? av (car l))
+                      (cons (car l) (R (cdr l))))
+                     (else
+                      (cons av (cdr l))))))))))
+      (R l))))</code></pre>
+
+<p>今日の範囲はなんか順を追って丁寧に説明しているようで逆にわざと落とし穴を作っているような説明。
+ゆっくり見ていきます。</p>
+
+<h2 id="toc_2">letccを使うと</h2>
+
+<p><code>(R (car l))</code>を求めてから<code>(car l)</code>と比較するってあたり、なんとなくもどかしさを感じます。
+<code>(R (car l))</code>を求めた時点で、その途中に<code>a</code>と等しいアトムがあったかどうかはわかっているはずで、<code>a</code>と等しいアトムがなかったことを確かめるために<code>(R (car l))</code>と<code>(car l)</code>を比較するのは無駄。リストが等しいことを確認しようとすると要素を全部たどらないといけないので。</p>
+
+<blockquote>
+<p>空リストを見つけたときに方位磁針を用いると、<code>rember1*</code>の役に立ちませんか。</p>
+</blockquote>
+
+<p>空リストが見つかったということは、削除すべきアトムがなかったということなので、削除前のリストがそのまま答えになるはず。
+役に立たせることはできそうな気がします。
+ただ、<code>car</code>を見ている間に空リストになってしまった場合はまだ<code>cdr</code>を見なきゃいけないとか、単純に終わってしまえばいいわけではないところが<code>leftmost</code>と異なるところです。</p>
+
+<p>補助関数から作り始めます。
+といってもこっちが本体のようなものですが。</p>
+
+<pre class="line-numbers"><code class="language-none">(define rm
+  (lambda (a l oh)
+    (cond
+      ((null? l) (oh (quote no)))
+      ((atom? (car l))
+       (if (eq? (car l) a)
+           (cdr l)
+           (cons (car l) (rm a (cdr l) oh))))
+      (else
+       (if (atom? 
+            (let/cc oh
+              (rm a (car l) oh)))
+           (cons (car l) (rm a (cdr l) oh))
+           (cons (rm a (car l) 0) (cdr l)))))))</code></pre>
+
+<h3 id="toc_3"><code>l</code>が空リストの時</h3>
+
+<p>空リストを見つけると、継続<code>oh</code>を使って<code>(quote no)</code>を返します。</p>
+
+<p>なぜ<code>(quote no)</code>なのかというと、失敗した時にリストを返してしまうと成功なのか失敗なのか判定できないからです。逆に、アトムであればnoだろうがyesだろうが問題ありません。</p>
+
+<p><code>leftmost</code>では失敗したとき<code>(quote ())</code>を返していました。
+都度失敗の値を何にするのか考えないといけないんでしょうか。</p>
+
+<h3 id="toc_4"><code>l</code>がアトムの時</h3>
+
+<p><code>(car l)</code>がアトムの時の処理は普通です。
+<code>oh</code>はそのまま渡しているということは押さえておきます。</p>
+
+<h3 id="toc_5"><code>l</code>がリストの時</h3>
+
+<p><code>(car l)</code>がアトムでなかった、つまりリストだった場合は、<code>(car l)</code>に<code>rm</code>を適用します。</p>
+
+<p>このとき、あらたに現時点の継続を<code>oh</code>にセットしてから<code>rm</code>を評価しています。
+<code>(car l)</code>の中に<code>a</code>が含まれているかどうかをテストするのが目的なので、もらってきたそのまま<code>oh</code>を渡してすっとばされては困りますから。</p>
+
+<p>で、アトム（つまり<code>no</code>）が返ってきた場合、<code>(car l)</code>に<code>a</code>が含まれなかったということなので<code>(rm a (car l) oh))</code>は<code>(car l)</code>で、<code>(cdr l)</code>から<code>a</code>を取り除いたものと<code>cons</code>します。</p>
+
+<p>そうでなければ、<code>(car l)</code>に<code>a</code>が含まれているということなので、<code>(rm a (car l) 0))</code>の値に<code>(cdr l)</code>を<code>cons</code>するだけ。</p>
+
+<p>って、<code>(rm a (car l) 0))</code>ってなんでしょうか？</p>
+
+<blockquote>
+<p><code>rm</code>がうまくアトムを取り除いてくれることがわかっていますから、方位磁針は必要ありません。</p>
+
+<p>つまり <code>(rm a (car l) 0)</code>を使うことができるという意味ですか。</p>
+
+<p>はい。どんな値でも大丈夫です。0は簡単な引数です。</p>
+</blockquote>
+
+<p>なんでもいいなら<code>()</code>でも<code>no</code>でも<code>oh</code>でも渡していいじゃないですか。
+<code>oh</code>渡せば<code>(rm a (car l) oh))</code>になって<code>let</code>でまとめられるし。</p>
+
+<h3 id="toc_6"><code>rm</code>の動作</h3>
+
+<p>動作を追うとこんな感じ。</p>
+
+<pre class="line-numbers"><code class="language-none">(let/cc Say (rm &#39;a &#39;((b) c (b)) Say))
+(let/cc Say (if (atom? (let/cc oh (rm &#39;a &#39;(b) oh))) ...))
+(let/cc Say (if (atom? (let/cc oh (cons &#39;b (rm &#39;a &#39;() oh)))) ...))
+(let/cc Say (if (atom? (let/cc oh (cons &#39;a (oh &#39;no)))) ...))
+(let/cc Say (if (atom? &#39;no) ...))
+(let/cc Say (cons &#39;(b) (rm &#39;a &#39;(c (b)) Say)))
+(let/cc Say (cons &#39;(b) (cons &#39;c (rm &#39;a &#39;((b)) Say))))
+(let/cc Say (cons &#39;(b) (cons &#39;c (if (atom? (let/cc oh (rm &#39;a &#39;() oh))) ...))))
+(let/cc Say (cons &#39;(b) (cons &#39;c (if (atom? &#39;no) ...))))
+(let/cc Say (cons &#39;(b) (cons &#39;c (cons &#39;(b) (rm &#39;a &#39;() Say)))))
+(let/cc Say (cons &#39;(b) (cons &#39;c (cons &#39;(b) (Say &#39;no)))))
+&#39;no</code></pre>
+
+<p>本の例をもとにしたんですが、else部分を通ってないのでカバー率が100%になってません。
+<code>let/cc</code>が入って、カバーすべきケースを思い浮かべるのが大変になってきた気がします。
+まじめにテスト項目あげようと思ったら頭痛くなるかも。</p>
+
+<h2 id="toc_7">バージョン1</h2>
+
+<p>呼び出し側を作ればいったんできあがりです。</p>
+
+<pre class="line-numbers"><code class="language-none">(define rember1*4
+  (lambda (a l)
+    (if (atom? (let/cc oh (rm a l oh)))
+        l
+        (rm a l (quote ())))))</code></pre>
+
+<p>こんどは使わない継続に<code>(quote ())</code>ですかやめれ。</p>
+
+<h2 id="toc_8">バージョン2</h2>
+
+<p><code>let</code>を使うとあら不思議・・・</p>
+
+<pre class="line-numbers"><code class="language-none">(define rember1*5
+  (lambda (a l)
+    (let ((new-l (let/cc oh (rm5 a l oh))))
+      (if (atom? new-l)
+          l
+          new-l))))
+  
+(define rm5
+  (lambda (a l oh)
+    (cond
+      ((null? l) (oh (quote no)))
+      ((atom? (car l))
+       (if (eq? (car l) a)
+           (cdr l)
+           (cons (car l) (rm5 a (cdr l) oh))))
+      (else
+       (let ((new-car (let/cc oh (rm5 a (car l) oh))))
+         (if (atom? new-car)
+             (cons (car l) (rm5 a (cdr l) oh))
+             (cons new-car (cdr l))))))))</code></pre>
+
+<p><code>(rm a (car l) 0)</code>や<code>(rm a l (quote ()))</code>が消えてしまいます！</p>
+
+<p>って、やっぱ2回評価される式に<code>let</code>で名前をつける、って言うんなら同じ式じゃないとよくないんじゃないですか？
+使われない引数だから何を渡しても結果は同じ。
+だから<code>let</code>でまとめてもやっぱり結果は同じなんでしょうけど。</p>
+
+<h2 id="toc_9">使われないことに意味がある？</h2>
+
+<p>失敗の時の値と同様、使われない値を何にするか考えるのもどうも気分がよろしくないです。</p>
+
+<p>失敗した時の値を<code>()</code>にしたり<code>no</code>にしたり、使われない値を渡すときの値を0にしたり<code>()</code>にしたり。
+ここまで一貫して一貫性がないのはなにか言いたいことが隠されているに違いない。
+返されない値や使われない値として適切なものを都度探す必要があるのは面倒。</p>
+
+<p>なにかひとつ他には絶対に使われない値を用意しておいたほうがすっきりするでしょうか？</p>
+
+<h2 id="toc_10">最終版</h2>
+
+<p>そしてこんな書き方が紹介されます。</p>
+
+<pre class="line-numbers"><code class="language-none">(define rember1*6
+  (lambda (a l)
+    (try oh (rm5 a l oh) l)))
+
+(define rm6
+  (lambda (a l oh)
+    (cond
+      ((null? l) (oh (quote no)))
+      ((atom? (car l))
+       (if (eq? (car l) a)
+           (cdr l)
+           (cons (car l) (rm6 a (cdr l) oh))))
+      (else
+       (try oh2
+            (cons (rm6 a (car l) oh2) (cdr l))
+            (cons (car l) (rm6 a (cdr l) oh)))))))</code></pre>
+
+<p>使われない引数に0や<code>()</code>を渡している部分は消えてしまいました。</p>
+
+<p><code>(quote no)</code>についても</p>
+
+<blockquote>
+<p>この版の<code>rember1*</code>は、<code>no</code>がアトムでないと動きませんか。</p>
+
+<p>いいえ。</p>
+</blockquote>
+
+<p>と言い切っているのでアトムですらなくて良いということに。
+うーむ。</p>
+
+<h2 id="toc_11"><code>try</code>って何よ</h2>
+
+<p>注には以下のように書いてあります。</p>
+
+<blockquote>
+<p>`(and ...)、(try ...)などは省略形です。</p>
+
+<pre class="line-numbers"><code class="language-none">(try x α β)
+=
+(letcc success
+  (letcc x
+    (success α))
+  β)</code></pre>
+
+<p>名前<code>success</code>はαやβの中に現れてはいけません。</p>
+</blockquote>
+
+<p><code>α</code>を評価して、普通に評価できたら次に<code>β</code>を評価するはずのところを忘れて
+<code>α</code>を評価した値をそのまま返し、
+<code>α</code>を評価中に継続<code>x</code>が呼び出されたら<code>α</code>の評価は中断して<code>β</code>の値を返す。</p>
+
+<p>他の言語では<code>raise</code>とか<code>throw</code>と書くところを<code>x</code>と書けばだいたい似た感じ。</p>
+
+<p>ということが落ち着いて読めばわかるんですが、
+letccが入れ子で書いてあるとなんだかややこしく見えてしまいます。
+if ... then ... else ... をgotoで書いているような感じに近い。
+慣れですかねえ。</p>
+
+<p><code>and</code>がschemeに含まれているように<code>try</code>も含まれているのかと思いましたが
+どうも含まれてない模様。
+例外の種類も渡せないし単純すぎて実用できないのかも。
+Racketには例外処理が最初からついてきますが、書き方が違うっぽいです。
+そこでマクロ定義方法をちょっと調べて作りました。
+上の定義をほとんどそのまま引き写し。</p>
+
+<pre class="line-numbers"><code class="language-none">(define-syntax-rule (try x a b)
+  (let/cc success
+    (let/cc x (success a))
+    b))</code></pre>
+
+<p>これで上のコードも動いています。意外と簡単。</p>
+
+<h2 id="toc_12">何を教えてくれようとしたの？</h2>
+
+<p>結局のところ、失敗の時は<code>try</code>を使え、それで万事うまくいく、っていう教えだったんでしょうか。
+それとも、<code>try</code>みたいなやつは<code>letcc</code>で作れるよ！って話？</p>
+
+<p>どうも<code>()</code>を返したり<code>no</code>を返したりしてるあたりがひっかかって、読み取るべきことが読み取れたのか不安です。</p>
+
+<p>＃成功した場合にあらゆる値を返せて、しかも失敗だったという情報もくっつけられて、<br>
+＃でもいちいち失敗だったという情報をチェックしなくていい一貫性のある方法が・・・<br>
+＃なんて言いはじめると違う言語の話になってしまうかな</p>
+
+
+</body>
+
+</html>

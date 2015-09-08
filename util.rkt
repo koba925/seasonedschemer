@@ -2,7 +2,12 @@
 
 (require rackunit)
 
-(provide atom? add1 sub1 one? eqlist? pick member? reverse Y)
+(provide try atom? add1 sub1 one? eqlist? pick member? reverse Y)
+
+(define-syntax-rule (try x a b)
+  (let/cc success
+    (let/cc x (success a))
+    b))
 
 (define atom?
   (lambda (x)
