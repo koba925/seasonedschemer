@@ -1,0 +1,85 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>seasonedschemer13.md</title><style>blockquote {
+  border-left: 4px solid #dddddd;
+  margin: 0 0;
+  padding: 0 15px;
+  color: #777777; }
+
+code {
+  margin: 0 5px;
+  padding: 0 5px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px; }
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+
+pre code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent; }</style></head><body id="preview">
+<h1><a id="Scheme13_deep_0"></a>Scheme修行(13) deep最終版</h1>
+<p>しばらくScratchやってる間に手を出してた何冊かの本が少し落ち着いてきました<br>
+ということでScheme修行再開します</p>
+<p>いろいろ忘れてる気がします<br>
+gitとか<br>
+まず何をするんだっけ？checkoutだっけ？<br>
+そんな調子</p>
+<p>scheme自体はそんなに忘れてない気がします<br>
+まあ覚えておかなければいけないことはちょっとしかありませんし<br>
+perlは1ヶ月使わなかったらもう完全に忘れる自信があります<br>
+戒律と掟はどうかなあ</p>
+<h2><a id="find_15"></a>見つからなくても大丈夫なfind</h2>
+<p>見つからなかったら#fを返すようにfindを書き換えます</p>
+<pre><code><span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">define</span></span> find
+  <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">lambda</span></span> <span class="hljs-list">(<span class="hljs-keyword">n</span> Ns Rs)</span>
+    <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">letrec</span></span>
+        <span class="hljs-list">(<span class="hljs-list">(<span class="hljs-keyword">A</span> <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">lambda</span></span> <span class="hljs-list">(<span class="hljs-keyword">ns</span> rs)</span>
+              <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">cond</span></span> <span class="hljs-list">(<span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">null?</span></span> ns)</span> <span class="hljs-literal">#f</span>)</span>
+                    <span class="hljs-list">(<span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">=</span></span> <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">car</span></span> ns)</span> n)</span> <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">car</span></span> rs)</span>)</span>
+                    <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">else</span></span> <span class="hljs-list">(<span class="hljs-keyword">A</span> <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">cdr</span></span> ns)</span> <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">cdr</span></span> rs)</span>)</span>)</span>)</span>)</span>)</span>)</span>
+      <span class="hljs-list">(<span class="hljs-keyword">A</span> Ns Rs)</span>)</span>)</span>)</span>
+</code></pre>
+<p>もともとリストしか返さなかった関数なのでこれでOK<br>
+なんでも返す可能性があるんだったら#fが見つかったのか何も見つからなかったのか判別できないのでこのやりかたは使えません<br>
+このあたりがちょっと気持ち悪い</p>
+<h2><a id="deep_34"></a>deep最終版</h2>
+<p>このfindを使うと、あらかじめmemberで値が含まれているのを確認してからfindを呼ぶ、という無駄を省くことができます<br>
+memberもfindもやってるのは似たようなことなのでぜひ消したいところ</p>
+<pre><code><span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">define</span></span> deep
+  <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">lambda</span></span> <span class="hljs-list">(<span class="hljs-keyword">m</span>)</span>
+    <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">cond</span></span> <span class="hljs-list">(<span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">zero?</span></span> m)</span> <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">quote</span></span> pizza)</span>)</span>
+          <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">else</span></span> <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">cons</span></span> <span class="hljs-list">(<span class="hljs-keyword">deepM</span> <span class="hljs-list">(<span class="hljs-keyword">sub1</span> m)</span>)</span> <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">quote</span></span> <span class="hljs-list">()</span>)</span>)</span>)</span>)</span>)</span>)</span>
+
+<span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">define</span></span> deepM
+  <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">let</span></span> <span class="hljs-list">(<span class="hljs-list">(<span class="hljs-keyword">Ns</span> <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">quote</span></span> <span class="hljs-list">()</span>)</span>)</span>
+        <span class="hljs-list">(<span class="hljs-keyword">Rs</span> <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">quote</span></span> <span class="hljs-list">()</span>)</span>)</span>)</span>
+    <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">lambda</span></span> <span class="hljs-list">(<span class="hljs-keyword">n</span>)</span>
+      <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">let</span></span> <span class="hljs-list">(<span class="hljs-list">(<span class="hljs-keyword">found</span> <span class="hljs-list">(<span class="hljs-keyword">find</span> n Ns Rs)</span>)</span>)</span>
+        <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">if</span></span> found
+            found
+            <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">let</span></span> <span class="hljs-list">(<span class="hljs-list">(<span class="hljs-keyword">result</span> <span class="hljs-list">(<span class="hljs-keyword">deep</span> n)</span>)</span>)</span>
+              <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">set!</span></span> Rs <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">cons</span></span> result Rs)</span>)</span>
+              <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">set!</span></span> Ns <span class="hljs-list">(<span class="hljs-keyword"><span class="hljs-built_in">cons</span></span> n Ns)</span>)</span>
+              result)</span>)</span>)</span>)</span>)</span>)</span>
+</code></pre>
+<p>元のソースでは、findが返してきた値がatom?かどうかで判定するという不思議なやり方になっていましたが<br>
+今ひとつ納得がいかないのでそこは書き換えました</p>
+<p>しかし久しぶりに見るせいかNsとRsが役に立っていないような気がしてきました<br>
+ちゃんと前回までの結果覚えててくれてる？</p>
+<p>この前はなんで納得してたんだっけ<br>
+あそうかletがlambdaの外にあるからか<br>
+どれどれデバッガで見てみよう
+覚えてる覚えてる</p>
+<h2><a id="_69"></a>おしまい</h2>
+<p>前回はどうもへんなところで終わってた模様<br>
+ちょっとしか書いてませんがここでキリをつけとかないとおかしいのでここでおしまい</p>
+
+</body></html>

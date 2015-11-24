@@ -56,136 +56,234 @@ ingredients
 
 (newline)
 
-(define deep
-  (lambda (m)
-    (cond ((zero? m) (quote pizza))
-          (else (cons (deep (sub1 m)) (quote ()))))))
-
-(deep 3)
-(deep 7)
-(deep 0)
-
-(newline)
-
-(define Ns (quote ()))
-(define Rs (quote ()))
-(define deepR
-  (lambda (n)
-    (let ((result (deep n)))
-    (set! Rs (cons result Rs))
-    (set! Ns (cons n Ns))
-    result)))
-
-(deepR 3)
-Ns
-Rs
-
-(deepR 5)
-Ns
-Rs
-
-(deepR 3)
-Ns
-Rs
-
-(newline)
-
-;(define find
-;  (lambda (n Ns Rs)
-;    (cond ((null? Ns) (quote ()))
-;          ((eq? (car Ns n)) (car Rs))
-;          (else (find n (cdr Ns) (cdr Rs))))))
-
 (define find
   (lambda (n Ns Rs)
     (letrec
         ((A (lambda (ns rs)
-              (cond ((= (car ns) n) (car rs))
+              (cond ((null? ns) #f)
+                    ((= (car ns) n) (car rs))
                     (else (A (cdr ns) (cdr rs)))))))
       (A Ns Rs))))
 
-(find 3 Ns Rs)
-(find 5 Ns Rs)
-;(find 7 Ns Rs)
+(define deep
+  (lambda (m)
+    (cond ((zero? m) (quote pizza))
+          (else (cons (deepM (sub1 m)) (quote ()))))))
 
 (define deepM
-  (lambda (n)
-    (if (member? n Ns)
-        (find n Ns Rs)
-        (deepR n))))
-
-(newline)
-
-(set! Ns (cdr Ns))
-(set! Rs (cdr Rs))
-Ns
-Rs
-
-(deepM 3)
-(deepM 5)
-(deepM 7)
-Ns
-Rs
-
-(newline)
-
-(define deepM2
-  (lambda (n)
-    (if (member? n Ns)
-        (find n Ns Rs)
-        (let ((result (deep n)))
-          (set! Rs (cons result Rs))
-          (set! Ns (cons n Ns))
-          result))))
-
-(set! Ns (cdr Ns))
-(set! Rs (cdr Rs))
-Ns
-Rs
-
-(deepM2 6)
-Ns
-Rs
-
-(newline)
-
-(define deep3
-  (lambda (m)
-    (cond ((zero? m) (quote pizza))
-          (else (cons (deepM3 (sub1 m)) (quote ()))))))
-
-(define deepM3
-  (lambda (n)
-    (if (member? n Ns)
-        (find n Ns Rs)
-        (let ((result (deep3 n)))
-          (set! Rs (cons result Rs))
-          (set! Ns (cons n Ns))
-          result))))
-
-(deepM3 3)
-(deepM3 5)
-(deepM3 7)
-(deepM3 9)
-Ns
-Rs
-
-(define deep4
-  (lambda (m)
-    (cond ((zero? m) (quote pizza))
-          (else (cons (deepM4 (sub1 m)) (quote ()))))))
-
-(define deepM4
   (let ((Ns (quote ()))
         (Rs (quote ())))
     (lambda (n)
-      (if (member? n Ns)
-          (find n Ns Rs)
-          (let ((result (deep4 n)))
-            (set! Rs (cons result Rs))
-            (set! Ns (cons n Ns))
-            result)))))
+      (let ((found (find n Ns Rs)))
+        (if found
+            found
+            (let ((result (deep n)))
+              (set! Rs (cons result Rs))
+              (set! Ns (cons n Ns))
+              result))))))
 
 (newline)
-(deepM4 3)
-;(deepM4 16)
+(deepM 0)
+(deepM 1)
+(deepM 3)
+
+(define L
+  (lambda (length)
+    (lambda (l)
+      (cond ((null? l) 0)
+            (else (add1 (length (cdr l))))))))
+
+(define length
+  (let ((h (lambda (l) 0)))
+    (set! h (L (lambda (arg) (h arg))))
+    h))
+
+(length '())
+(length '(a b))
+
+(let ((h (lambda (l) 0)))
+    (set! h (L (lambda (arg) (h arg))))
+(h '(a b))
+((L (lambda (arg) (h arg))) '(a b))
+((lambda (l) (cond ((null? l) 0) (else (add1 ((lambda (arg) (h arg)) (cdr l)))))) '(a b))
+(add1 ((lambda (arg) (h arg)) '(b)))
+(add1 (h '(b)))
+(add1 ((L (lambda (arg) (h arg))) '(b)))
+(add1 ((lambda (l) (cond ((null? l) 0) (else (add1 ((lambda (arg) (h arg)) (cdr l)))))) '(b)))
+(add1 (add1 ((lambda (arg) (h arg)) '())))
+(add1 (add1 (h '())))
+(add1 (add1 ((L (lambda (arg) (h arg))) '())))
+(add1 (add1 ((lambda (l) (cond ((null? l) 0) (else (add1 ((lambda (arg) (h arg)) (cdr l)))))) '())))
+(add1 (add1 0))
+(add1 1)
+2
+)
+
+(define Y!
+  (lambda (L)
+    (let ((h (lambda (l) (quote ()))))
+      (set! h (L (lambda (arg) (h arg))))
+      h)))
+
+(println "Y! L")
+((Y! L) '())
+((Y! L) '(a b))
+(((lambda (L)
+    (let ((h (lambda (l) (quote ()))))
+      (set! h (L (lambda (arg) (h arg))))
+      h))
+  (lambda (length)
+    (lambda (l)
+      (cond ((null? l) 0)
+            (else (add1 (length (cdr l))))))))
+ '(a b))
+
+((let ((h (lambda (l) (quote ()))))
+      (set! h ((lambda (length)
+                 (lambda (l)
+                   (cond ((null? l) 0)
+                         (else (add1 (length (cdr l)))))))
+               (lambda (arg) (h arg))))
+      h)  
+ '(a b))
+
+((let ((h (lambda (l) (quote ()))))
+      (set! h ((lambda (length)
+                 (lambda (l)
+                   (cond ((null? l) 0)
+                         (else (add1 (length (cdr l)))))))
+               (lambda (arg) (h arg))))
+      h)  
+ '(a b))
+
+(println "Y L")
+((Y L) '())
+((Y L) '(a b))
+
+(((lambda (le)
+    ((lambda (g) (g g))
+     (lambda (g) (le (lambda (x) ((g g) x))))))
+  (lambda (length)
+    (lambda (l)
+      (cond ((null? l) 0)
+            (else (add1 (length (cdr l))))))))
+ '(a b))
+
+(((lambda (g) (g g))
+  (lambda (g)
+    ((lambda (length)
+       (lambda (l)
+         (cond ((null? l) 0)
+               (else (add1 (length (cdr l)))))))
+     (lambda (x) ((g g) x)))))
+ '(a b))
+
+(((lambda (g)
+    ((lambda (length)
+       (lambda (l)
+         (cond ((null? l) 0)
+               (else (add1 (length (cdr l)))))))
+     (lambda (x) ((g g) x))))
+  (lambda (g)
+    ((lambda (length)
+       (lambda (l)
+         (cond ((null? l) 0)
+               (else (add1 (length (cdr l)))))))
+     (lambda (x) ((g g) x)))))
+ '(a b))
+
+(define Y-bang
+  (lambda (f)
+    (letrec ((h (f (lambda (arg) (h arg)))))
+      h)))
+
+(println "Y-bang L")
+((Y-bang L) '())
+((Y-bang L) '(a b))
+
+(define D
+  (lambda (depth*)
+    (lambda (s)
+      (cond ((null? s) 1)
+            ((atom? (car s)) (depth* (cdr s)))
+            (else (max (add1 (depth* (car s))) (depth* (cdr s))))))))
+
+(define depth* (Y! D))
+
+(depth* '())
+(depth* '(a a))
+(depth* '((a a) b))
+(depth* '(a (b b)))
+
+(define biz
+  (let ((x 0))
+    (lambda (f)
+      (set! x (add1 x))
+      (lambda (a) (if (= a x) 0 (f a))))))
+
+;((Y! biz) 5)
+;(((lambda (L)
+;    (let ((h (lambda (l) 0)))
+;      (set! h (L (lambda (arg) (h arg))))
+;      h))
+;  (lambda (f)
+;      (set! x (add1 x))
+;      (lambda (a) (if (= a x) 0 (f a)))))
+; 5)
+
+(define YY
+  (lambda (le)
+    ((lambda (g) (g g))
+     (lambda (g) (le (lambda (x) ((g g) x)))))))
+
+((YY biz) 5)
+
+(let ((x 0))
+  (((lambda (le)
+      ((lambda (g) (g g))
+       (lambda (g) (le (lambda (x) ((g g) x))))))
+    (lambda (f)
+      (set! x (add1 x))
+      (lambda (a) (if (= a x) 0 (f a)))))
+   5)
+  )
+
+(let ((x 0))
+  (((lambda (g) (g g))
+    (lambda (g) ((lambda (f)
+                   (set! x (add1 x))
+                   (lambda (a) (if (= a x) 0 (f a)))) (lambda (x) ((g g) x)))))
+   5)
+  )
+
+(let ((x 0))
+  (((lambda (g) ((lambda (f)
+                   (set! x (add1 x))
+                   (lambda (a) (if (= a x) 0 (f a)))) (lambda (x) ((g g) x))))
+    (lambda (g) ((lambda (f)
+                   (set! x (add1 x))
+                   (lambda (a) (if (= a x) 0 (f a)))) (lambda (x) ((g g) x)))))
+   5)
+  )
+
+(define a1
+  (lambda (n) (+ n 1)))
+
+(a1 10)
+((lambda (n) (+ n 1)) 10)
+
+(define a2
+  (lambda (f)
+    (lambda (n) (f (f n)))))
+
+((a2 a1) 10)
+(((lambda (f)
+    (lambda (n) (f (f n))))
+  (lambda (n) (+ n 1)))
+ 10)
+((lambda (n)
+   ((lambda (n) (+ n 1))
+    ((lambda (n) (+ n 1)) n)))  
+ 10)
+((lambda (n) (+ n 1))
+ ((lambda (n) (+ n 1)) 10))  

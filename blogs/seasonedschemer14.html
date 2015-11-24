@@ -1,0 +1,254 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer14</title>
+<style>
+blockquote {
+  border-left: 4px solid #dddddd;
+  margin: 0 0;
+  padding: 0 15px;
+  color: #777777; }
+
+code {
+  margin: 0 5px;
+  padding: 0 5px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px; }
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+
+pre code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent; }
+</style>
+</head>
+<body>
+<h1 id="toc_0">Scheme修行(14) アレふたたび</h1>
+
+<p>突然話題が変わります</p>
+
+<blockquote>
+<p>lengthを覚えていますか。</p>
+</blockquote>
+
+<p>さすがに見ないで書けるようになりました</p>
+
+<blockquote>
+<p>次の値は何ですか。</p>
+
+<pre class="line-numbers"><code class="language-none">(define length
+  (lambda (l) 0))
+
+(set! length
+      (lambda (l)
+        (cond ((null? l) 0)
+              (else (add1 (length (cdr l)))))))</code></pre>
+</blockquote>
+
+<p>値は例によってありませんが、何かへんてこなことを始めました<br>
+このlengthでも動くことは動きます<br>
+次に第16の戒律に沿って書き換えます</p>
+
+<pre class="line-numbers"><code class="language-none">(define length
+  (let ((h (lambda (l) 0)))
+    (set! h (lambda (l)
+              (cond ((null? l) 0)
+                    (else (add1 (h (cdr l)))))))
+    h))</code></pre>
+
+<p>何でしょうかこれは<br>
+今までとは違うletの使い方が加わった模様</p>
+
+<blockquote>
+<p>第17の戒律（最終版）<br>
+(let ((x ...)) ...)に対して(set! x ...)を用いる際には、
+それらの間に少なくとも1つの(lambda ... を置くか、
+xの新しい値がxを参照する関数のときのみにせよ。</p>
+</blockquote>
+
+<p>(add1 (h (cdr l)))の方に出てくるhは、元のhを指してるのか<br>
+いま定義してる真っ最中のhを指してるのか<br>
+書いてあることからはわかりませんが<br>
+このlengthが普通のlengthと同じように動くためには<br>
+hが自分自身を参照している必要があります</p>
+
+<p>lengthっぽい部分を取り出してLとします</p>
+
+<pre class="line-numbers"><code class="language-none">(define length
+  (let ((h (lambda (l) 0)))
+    (set! h (L (lambda (arg) (h arg))))
+    h))
+
+(define L
+  (lambda (length)
+    (lambda (l)
+      (cond ((null? l) 0)
+            (else (add1 (length (cdr l))))))))</code></pre>
+
+<p>(lambda (arg) (h arg))ってどこかで見たような<br>
+これはもしや・・・アレでしょうか</p>
+
+<p>ここらへんで一度動きを確かめてみます</p>
+
+<pre class="line-numbers"><code class="language-none">(length &#39;(a b))
+(h &#39;(a b))
+((L (lambda (arg) (h arg))) &#39;(a b))
+((lambda (l) (cond ((null? l) 0) (else (add1 ((lambda (arg) (h arg)) (cdr l)))))) &#39;(a b))
+(add1 ((lambda (arg) (h arg)) &#39;(b)))
+(add1 (h &#39;(b)))
+(add1 ((L (lambda (arg) (h arg))) &#39;(b)))
+(add1 ((lambda (l) (cond ((null? l) 0) (else (add1 ((lambda (arg) (h arg)) (cdr l)))))) &#39;(b)))
+(add1 (add1 ((lambda (arg) (h arg)) &#39;())))
+(add1 (add1 (h &#39;())))
+(add1 (add1 ((L (lambda (arg) (h arg))) &#39;())))
+(add1 (add1 ((lambda (l) (cond ((null? l) 0) (else (add1 ((lambda (arg) (h arg)) (cdr l)))))) &#39;())))
+(add1 (add1 0))
+(add1 1)
+2</code></pre>
+
+<p>確かに動きます<br>
+SICPには代入が出てくるとこういうやりかたはうまくいかないって書いてありましたが</p>
+
+<p>h のことをわざわざ (lambda (arg) (h arg)) と書いているのは<br>
+きっとScheme手習いでやったように無限ループになるんだろうな  </p>
+
+<p>試しにそのままhと書いてみます</p>
+
+<pre class="line-numbers"><code class="language-none">(define length
+  (let ((h (lambda (l) 0)))
+    (set! h (L h))
+    h))
+
+&gt; (length &#39;(a b c))
+1</code></pre>
+
+<p>ええ？こうじゃないの？しかも1って何</p>
+
+<pre class="line-numbers"><code class="language-none">(length &#39;(a b))
+(h &#39;(a b))
+((L h) &#39;(a b))
+(((lambda (length) ...) (L h)) &#39;(a b))
+(((lambda (length) ...) ((lambda (length) ...) (L h))) &#39;(a b))
+(((lambda (length) ...) ((lambda (length) ...) ((lambda (length) ...) (L h)))) &#39;(a b))</code></pre>
+
+<p>...<br>
+考えてもわからなかったのでスルーします<br>
+心苦しいけれども本筋とは関係ないので<br>
+説明できる方いたらぜひ教えて下さい</p>
+
+<blockquote>
+<p>lengthがLの関数になるように、定義を書きなおしてください。
+その新しい関数をY!とします。</p>
+</blockquote>
+
+<p>やっぱりYのしわざか</p>
+
+<pre class="line-numbers"><code class="language-none">(define Y!
+  (lambda (L)
+    (let ((h (lambda (l) (quote ()))))
+      (set! h (L (lambda (arg) (h arg))))
+      h)))
+
+(define length (Y! L))</code></pre>
+
+<p>こうも書けます</p>
+
+<pre class="line-numbers"><code class="language-none">(define Y-bang
+  (lambda (f)
+    (letrec ((h (f (lambda (arg) (h arg)))))
+      h)))
+
+(define length (Y-bang L))</code></pre>
+
+<p>letrecはletとsetがあれば作れるということ<br>
+シンタックスシュガーというわけです  </p>
+
+<p>振り返るとScheme手習いの時に無理やり作ったdefineはdefineというより<br>
+劣化版letrecだった気がします</p>
+
+<blockquote>
+<p>ここで見てきたことは、まさに「適用順手続き的Yコンビネータ」の導出です。</p>
+</blockquote>
+
+<p>そういうわけでした</p>
+
+<p>Scheme手習いでやった「適用順Yコンビネータ」はコード見ても何がなんだかさっぱりでした<br>
+こちらは細かい動きはともかくとして再帰させようとしてるんだということくらいはわかります</p>
+
+<blockquote>
+<p>(Y f)の値は(Y! f)の値と同じ再帰関数だというのは正しいですか。
+はい、関数Y!はこの形をしたすべてのfに対してYと同じ再帰関数を作り出します。</p>
+</blockquote>
+
+<p>正しいそうですが同じって何でしょう<br>
+実質同じ働きをする関数という意味ではそのとおりだと思いますが<br>
+fとしてLやDを与えてみても字面まで同じになるわけではなさそうです</p>
+
+<p>Yに食わせる関数とは異なる形のこんな関数で試します<br>
+bizはbizarreの略です</p>
+
+<pre class="line-numbers"><code class="language-none">(define biz
+  (let ((x 0))
+    (lambda (f)
+      (set! x (add1 x))
+      (lambda (a) (if (= a x) 0 (f a))))))</code></pre>
+
+<p>字面的には、再帰するたびにxがひとつずつ増えていって5になったところで0を返しそうな雰囲気です  </p>
+
+<p>((Y biz) 5)は想定どおり0を返しますが、((Y! biz) 5)は無限ループになってしまいます<br>
+xが1のまま増えていってないようです<br>
+(set! x (add1 x))が1回しか評価されてないのか、毎回別のxが作られて0になっているのか、<br>
+そんなところでしょうか  </p>
+
+<p>細かく追ってみます<br>
+((Y! biz) 5)の評価ではxが1、fが(lambda (arg) (h arg))、<br>
+関数本体が(lambda (a) (if (= a x) 0 (f a)))なクロージャがhに結び付けられてから<br>
+5にhが適用されるぽいです<br>
+(set! x (add1 x))はすでに評価済みのため、その後xが加算されることはありません</p>
+
+<p>いつもどおりに式を並べていく方式だと途中で破綻してしまうので<br>
+evalの気持ちになって考えてみました<br>
+こんな感じです</p>
+
+<ol>
+<li>(define biz ...) を評価します</li>
+<li>xが0、関数本体が (lambda (f) ...)なクロージャにbizが結び付けられます</li>
+<li>((Y! biz) 5)を評価します</li>
+<li>(Y! biz)を評価します</li>
+<li>Y!は(lambda (L) ...)に評価されます</li>
+<li>bizはxが0、関数本体が (lambda (f) ...)なクロージャに評価されます</li>
+<li>bizにY!を適用します</li>
+<li>Lにxが0、関数本体が (lambda (f) ...)なクロージャが結び付けられます</li>
+<li>Y!でhをいったん作ります</li>
+<li>Lに(lambda (arg) (h arg))を適用します</li>
+<li>fに(lambda (arg) (h arg))が結び付けられます</li>
+<li>xに1が加えられます</li>
+<li>xが1、fが(lambda (arg) (h arg))、関数本体が(lambda (a) (if (= a x) 0 (f a)))なクロージャがhに結び付けられます</li>
+<li>5にhを適用します</li>
+</ol>
+
+<p>一方((Y biz) 5)ではbizのlambdaがそのままの形で再帰されるため<br>
+呼び出しのたびに(set! x (add1 x))が評価され、想定どおりにxが加算されていきます</p>
+
+<blockquote>
+<p>帽子はまだ小さくなっていませんか。</p>
+</blockquote>
+
+<p>Yコンビネータがわかっているならこれくらいでは小さくならないそうですが<br>
+けっこう小さくなりましたよ</p>
+
+
+</body>
+
+</html>
