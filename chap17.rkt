@@ -26,7 +26,7 @@
     (letrec ((D (lambda (m)
                   (if (zero? m)
                       (quote pizza)
-                      (cons (D (sub1 m)) (quote ()))))))
+                      (cons (deepM (sub1 m)) (quote ()))))))
       (lambda (n)
         (let ((exists (find n Ns Rs)))
           (if (atom? exists)
