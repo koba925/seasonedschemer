@@ -29,8 +29,11 @@
 (deepM 0)
 (deepM 3)
 
+(define counter #f)
+
 (define consC
   (let ((N 0))
+    (set! counter (lambda () N))
     (lambda (x y)
       (set! N (add1 N))
       (cons x y))))
@@ -41,6 +44,7 @@
         (quote pizza)
         (consC (deep (sub1 m)) (quote ())))))
 
-(deep 0)
-(deep 3)
-
+(deep 5)
+(counter)
+(deep 7)
+(counter)
