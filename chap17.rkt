@@ -22,15 +22,15 @@
 
 (define deepM
   (let ((Rs (quote ()))
-        (Ns (quote ()))
-        (D (lambda (m)
-             (if (zero? m)
-                 (quote pizza)
-                 (cons (deepM (sub1 m)) (quote ()))))))
+        (Ns (quote ())))
     (lambda (n)
       (let ((exists (find n Ns Rs)))
         (if (atom? exists)
-            (let ((result (D n)))
+            (let ((result
+                   ((lambda (m)
+                      (if (zero? m)
+                          (quote pizza)
+                          (cons (deepM (sub1 m)) (quote ())))) n)))
               (set! Rs (cons result Rs))
               (set! Ns (cons n Ns))
               result)
