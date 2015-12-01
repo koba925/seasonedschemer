@@ -48,3 +48,17 @@
 (counter)
 (deep 7)
 (counter)
+
+(define supercounter
+  (lambda (f)
+    (letrec
+        ((S (lambda (n)
+              (if (zero? n)
+                  (f n)
+                  (let ()
+                    (f n)
+                    (S (sub1 n)))))))
+      (S 1000)
+      (counter))))
+
+(supercounter deep)
