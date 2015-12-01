@@ -27,10 +27,9 @@
       (let ((exists (find n Ns Rs)))
         (if (atom? exists)
             (let ((result
-                   (let ((m n))
-                     (if (zero? m)
-                         (quote pizza)
-                         (cons (deepM (sub1 m)) (quote ()))))))
+                   (if (zero? n)
+                       (quote pizza)
+                       (cons (deepM (sub1 n)) (quote ())))))
               (set! Rs (cons result Rs))
               (set! Ns (cons n Ns))
               result)
