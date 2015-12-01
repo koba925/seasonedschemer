@@ -2,15 +2,6 @@
 
 (require "util.rkt")
 
-(define deep
-  (lambda (m)
-    (if (zero? m)
-        (quote pizza)
-        (cons (deep (sub1 m)) (quote ())))))
-
-(deep 0)
-(deep 3)
-
 (define find
   (lambda (n Ns Rs)
     (cond ((null? Ns) #f)
@@ -37,3 +28,19 @@
 
 (deepM 0)
 (deepM 3)
+
+(define consC
+  (let ((N 0))
+    (lambda (x y)
+      (set! N (add1 N))
+      (cons x y))))
+
+(define deep
+  (lambda (m)
+    (if (zero? m)
+        (quote pizza)
+        (consC (deep (sub1 m)) (quote ())))))
+
+(deep 0)
+(deep 3)
+
