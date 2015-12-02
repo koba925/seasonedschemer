@@ -30,10 +30,11 @@
 (deepM 3)
 
 (define counter #f)
-
+(define set-counter #f)
 (define consC
   (let ((N 0))
     (set! counter (lambda () N))
+    (set! set-counter (lambda (x) (set! N x)))
     (lambda (x y)
       (set! N (add1 N))
       (cons x y))))
@@ -61,4 +62,5 @@
       (S 1000)
       (counter))))
 
+(set-counter 0)
 (supercounter deep)
