@@ -11,24 +11,6 @@
 (find 3 '(1 2 3 4) '(a b c d))
 (find 0 '(1 2 3 4) '(a b c d))
 
-(define deepM
-  (let ((Rs (quote ()))
-        (Ns (quote ())))
-    (lambda (n)
-      (let ((exists (find n Ns Rs)))
-        (if (atom? exists)
-            (let ((result
-                   (if (zero? n)
-                       (quote pizza)
-                       (cons (deepM (sub1 n)) (quote ())))))
-              (set! Rs (cons result Rs))
-              (set! Ns (cons n Ns))
-              result)
-            exists)))))
-
-(deepM 0)
-(deepM 3)
-
 (define counter #f)
 (define set-counter #f)
 (define consC
@@ -64,3 +46,21 @@
 
 (set-counter 0)
 (supercounter deep)
+
+(define deepM
+  (let ((Rs (quote ()))
+        (Ns (quote ())))
+    (lambda (n)
+      (let ((exists (find n Ns Rs)))
+        (if (atom? exists)
+            (let ((result
+                   (if (zero? n)
+                       (quote pizza)
+                       (consC (deepM (sub1 n)) (quote ())))))
+              (set! Rs (cons result Rs))
+              (set! Ns (cons n Ns))
+              result)
+            exists)))))
+
+(set-counter 0)
+(supercounter deepM)
