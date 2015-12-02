@@ -64,3 +64,44 @@
 
 (set-counter 0)
 (supercounter deepM)
+
+(define rember1*C
+  (lambda (a l)
+    (letrec ((R (lambda (l oh)
+                  (cond ((null? l) (oh (quote no)))
+                        ((atom? (car l))
+                         (if (eq? (car l) a)
+                             (cdr l)
+                             (consC (car l) (R (cdr l) oh))))
+                        (else
+                         (let ((new-car (let/cc oh (R (car l) oh))))
+                           (if (atom? new-car)
+                               (consC (car l) (R (cdr l) oh))
+                               (consC new-car (cdr l)))))))))
+      (let ((new-l (let/cc oh (R l oh))))
+        (if (atom? new-l)
+            l
+            new-l)))))
+
+(set-counter 0)
+(rember1*C 'noodles '((food) more (food)))
+(counter)
+
+(define rember1*C2
+  (lambda (a l)
+    (letrec ((R (lambda (l)
+                  (cond ((null? l) (quote ()))
+                        ((atom? (car l))
+                         (if (eq? (car l) a)
+                             (cdr l)
+                             (consC (car l) (R (cdr l)))))
+                        (else
+                         (let ((av (R (car l))))
+                           (if (eqlist? (car l) av)
+                               (consC (car l) (R (cdr l)))
+                               (consC av (cdr l)))))))))
+      (R l))))
+
+(set-counter 0)
+(rember1*C2 'noodles '((food) more (food)))
+(counter)
