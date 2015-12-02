@@ -1,0 +1,159 @@
+<style>
+blockquote {
+  border-left: 4px solid #dddddd;
+  margin: 0 0;
+  padding: 0 15px;
+  color: #777777; }
+
+code {
+  margin: 0 5px;
+  padding: 0 5px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px; }
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+
+pre code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent; }
+</style>
+<h1 id="scheme-15-">Scheme修行 15 状態</h1>
+<p>「17. 我変わる、ゆえに我あり！」ではふたたびdeepMをいじります</p>
+<h2 id="deepm">deepMの改良(？)</h2>
+<p>deepを内部に持つバージョンから始めます</p>
+<pre><code>(define deepM
+  (let ((Rs (quote ()))
+        (Ns (quote ())))
+    (letrec ((D (lambda (m)
+                  (if (zero? m)
+                      (quote pizza)
+                      (cons (D (sub1 m)) (quote ()))))))
+      (lambda (n)
+        (let ((exists (find n Ns Rs)))
+          (if (atom? exists)
+              (let ((result (D n)))
+                (set! Rs (cons result Rs))
+                (set! Ns (cons n Ns))
+                result)
+              exists))))))</code></pre>
+<p>これはメモ化が十分に働かない半バグバージョン<br />
+これを何度か修正して、以下のような形にします</p>
+<pre><code>(define deepM
+  (let ((Rs (quote ()))
+        (Ns (quote ())))
+    (lambda (n)
+      (let ((exists (find n Ns Rs)))
+        (if (atom? exists)
+            (let ((result
+                   (if (zero? n)
+                       (quote pizza)
+                       (cons (deepM (sub1 n)) (quote ())))))
+              (set! Rs (cons result Rs))
+              (set! Ns (cons n Ns))
+              result)
+            exists)))))</code></pre>
+<p>この間にやったことは以下のとおり</p>
+<ol>
+<li>正しくメモ化が動くようにする</li>
+<li>Dの呼び出しをdeepMに変えるだけ</li>
+<li>letrecをletに変更する</li>
+<li>自分自身を呼んでいないので</li>
+<li>ふたつのletをひとつにまとめる</li>
+<li>一度しか呼ばれていないDを、lambdaに置き換える</li>
+<li>(lambda (m) (...) n) を (let ((m n)) ...)に書き換える</li>
+<li>(let ((m n)) ...) からmを消す</li>
+</ol>
+<p>ここでは何を教えてくれているのでしょうか？</p>
+<ul>
+<li>式の変形の練習みたいなもの？</li>
+<li>なにか計算機科学的な背景がある？</li>
+<li>次にやること(consの回数を数える)の準備なだけ？</li>
+</ul>
+<p>狙いがわかりませんでした</p>
+<h2 id="deepmcons">deepMのconsを数える</h2>
+<p>呼ばれた回数を数えるconsを作ります</p>
+<pre><code>(define counter #f)
+(define set-counter #f)
+(define consC
+  (let ((N 0))
+    (set! counter (lambda () N))
+    (set! set-counter (lambda (x) (set! N x)))
+    (lambda (x y)
+      (set! N (add1 N))
+      (cons x y))))</code></pre>
+<p>(set! counter (lambda () N)) というのがちょっと不思議な感じですが<br />
+こんなふうにNを直接見せてもやりたいことはやれるんですけれども</p>
+<pre><code>(define N 0)
+
+(define consC
+  (lambda (x y)
+    (set! N (add1 N))
+    (cons x y)))</code></pre>
+<p>好き放題されてしまうので行儀がよろしくないということでしょう<br />
+Javaで言うところのSetter、Getterみたいな感じですね<br />
+外から勝手に使うことのできない状態をクロージャに持つことができました</p>
+<p>なお(define counter #f)の#fには意味はありません<br />
+(define counter)でもいいしそれで通る処理系もあるのですが<br />
+Racketでは通らなかったのでとりあえず#fと書いてます</p>
+<p>consCを呼ぶようにdeepを書き換えて</p>
+<pre><code>(define deep
+  (lambda (m)
+    (if (zero? m)
+        (quote pizza)
+        (consC (deep (sub1 m)) (quote ())))))</code></pre>
+<p>(deep 0)から(deep 1000)まで実行してやると</p>
+<pre><code>(define supercounter
+  (lambda (f)
+    (letrec
+        ((S (lambda (n)
+              (if (zero? n)
+                  (f n)
+                  (let ()
+                    (f n)
+                    (S (sub1 n)))))))
+      (S 1000)
+      (counter))))
+
+(set-counter 0)
+(supercounter deep)</code></pre>
+<p>500500回consを実行したことがわかります</p>
+<blockquote>
+<p>ありがとう Carl F. Gauss (1777-1855)。</p>
+</blockquote>
+<p>deepMのconsを数えてやると</p>
+<pre><code>(define deepM
+  (let ((Rs (quote ()))
+        (Ns (quote ())))
+    (lambda (n)
+      (let ((exists (find n Ns Rs)))
+        (if (atom? exists)
+            (let ((result
+                   (if (zero? n)
+                       (quote pizza)
+                       (consC (deepM (sub1 n)) (quote ())))))
+              (set! Rs (cons result Rs))
+              (set! Ns (cons n Ns))
+              result)
+            exists)))))
+
+(set-counter 0)
+(supercounter deepM)</code></pre>
+<p>メモ化の効果で1000回で済んでいることがわかります<br />
+だから速くなったのかというとちょっとわかりませんが</p>
+<h2 id="rember1cons">rember1*のconsを数える</h2>
+<p>14章のrember1*のconsを数えます<br />
+最初に作った版では、引数に取ったリストをそのまま返すだけでいい場合でも<br />
+１からリストを作っていたので余分なconsを行っていました<br />
+継続を使った版では、指定されたアトムがリスト内に存在しなければ<br />
+継続で即抜けて、指定されたリストをそのまま返しますので無駄なconsは実行されません<br />
+と言いたいだけなのか、もっと大事なことを言おうとしているのかわかりません</p>
