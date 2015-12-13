@@ -81,4 +81,134 @@ karはkarを返す関数を、kdrはkdrを返す関数をkonsに渡してやっ�
 
 次に、kdrを書き換えられるようにします
 karを書き換えられるようにしないのは紙面の都合ってやつでしょうか
+書き換えられなくっていいということはなさそうですし
 
+```
+(define bons
+  (lambda (kar)
+    (let ((kdr (quote ())))
+      (lambda (selector)
+        (selector
+         (lambda (x) (set! kdr x))
+         kar
+         kdr)))))
+
+(define kar
+  (lambda (c)
+    (c (lambda (s a d) a))))
+
+(define kdr
+  (lambda (c)
+    (c (lambda (s a d) d))))
+
+(define set-kdr
+  (lambda (c x) ((c (lambda (s a d) s)) x)))
+
+(define kons
+  (lambda (a d)
+    (let ((c (bons a)))
+      (set-kdr c d)
+      c)))
+```
+
+konsがどうなっているのか見えないのも不便ですのでkonsを目に見えるように
+表示するような関数でも作りましょう
+
+```
+(define wride
+  (lambda (l)
+    (letrec ((W (lambda (l)
+                  (cond ((null? l) (display "'()"))
+                        ((atom? l) (write l))
+                        (else
+                         (display "(kons ")
+                         (W (kar l))
+                         (display " ")
+                         (W (kdr l))
+                         (display ")"))))))
+      (W l)
+      (newline))))
+```
+
+どれどれ
+
+```
+> (wride (kons 1 '()))
+#<procedure:...hemer/chap18.rkt:8:6>
+```
+
+ぶほ
+
+・・・
+
+konsはlambdaですがlambdaはatom?ですのでリストとは思ってもらえませんでした
+まんまと影法師にしてやられています
+
+考えてもkonsが作ったlambdaと他のlambdaを区別する方法が思いつかなかったので
+lambdaはアトムってことにしました
+ほんとは無茶ですが
+
+```
+(define adom?
+  (lambda (s)
+    (and (atom? s) (not (procedure? s)))))
+
+(define wride
+  (lambda (l)
+    (letrec ((W (lambda (l)
+                  (cond ((null? l) (display "'()"))
+                        ((adom? l) (write l))
+                        (else
+                         (display "(kons ")
+                         (W (kar l))
+                         (display " ")
+                         (W (kdr l))
+                         (display ")"))))))
+      (W l)
+      (newline))))
+```
+
+どうかな
+
+```
+> (wride (kons 1 (kons (kons 2 (kons 3 '())) '())))
+(kons 1 (kons (kons 2 (kons 3 '())) '()))
+```
+
+大丈夫そうです
+
+これで新しいkonsとset-kdrのテストがしやすくなります
+
+```
+> (define l (kons 1 (kons 2 '())))
+> (wride l)
+(kons 1 (kons 2 '()))
+
+> (set-kdr l (kons 2 (kons 3 '())))
+> (wride l)
+(kons 1 (kons 2 (kons 3 '())))
+
+> (wride (kdr l))
+(kons 2 (kons 3 '()))
+
+> (wride (kar (kdr l)))
+2
+```
+
+おｋぽいです
+
+ところでkonsを作るのになぜいったんbonsを作っているのでしょう
+いきなりkonsだって作れそうですが
+
+```
+(define gons
+  (lambda (kar kdr)
+      (lambda (selector)
+        (selector
+         (lambda (x) (set! kdr x))
+         kar
+         kdr))))
+```
+
+これでも普通に動くんですけどねえ
+より小さい単位に分割したってことでしょうか
