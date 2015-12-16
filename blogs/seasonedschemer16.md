@@ -145,8 +145,8 @@ konsはlambdaですがlambdaはatom?ですのでリストとは思ってもら�
 まんまと影法師にしてやられています
 
 考えてもkonsが作ったlambdaと他のlambdaを区別する方法が思いつかなかったので
-lambdaはアトムってことにしました
-ほんとは無茶ですが
+lambdaはリストってことにしました
+無茶ですが
 
 ```
 (define adom?
