@@ -1,0 +1,216 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer16</title>
+
+</head>
+<body>
+<h1 id="toc_0">Scheme修行 (16) consをlambdaで表現する</h1>
+
+<p>18章「我変わる、ゆえに我同じなり！」のひとつのヤマはこれ</p>
+
+<pre><code class="language-none">(define kons
+  (lambda (kar kdr)
+    (lambda (selector)
+      (selector kar kdr))))
+
+(define kar
+  (lambda (c)
+    (c (lambda (a d) a))))
+
+(define kdr
+  (lambda (c)
+    (c (lambda (a d) d))))</code></pre>
+
+<p>cons、car、cdrをlambdaで書いてしまったというもの<br>
+Schemeのコア中のコアと思っていたものが、実はlambdaで書けるという<br>
+楽しくなってまいりました（個人的趣味</p>
+
+<p>konsの値は表示してくれませんが</p>
+
+<pre><code class="language-none">&gt; (kons 2 (kons 1 (quote ())))
+#&lt;procedure:...hemer/chap18.rkt:7:4&gt;</code></pre>
+
+<p>karやkdrで皮をめくっていけばアトムは表示されます</p>
+
+<pre><code class="language-none">&gt; (kar (kons 2 (kons 1 (quote ())))) ;(car &#39;(2 1))
+2
+
+&gt; (kar (kdr (kons 2 (kons 1 (quote ()))))) ;(car (cdr &#39;(2 1)))
+1
+
+&gt; (kdr (kdr (kons 2 (kons 1 (quote ())))))  ;(cdr (cdr &#39;(2 1)))
+&#39;()</code></pre>
+
+<p>konsにselectorという関数を渡しているのが目に新鮮です<br>
+やってることはそれほど難しくありません<br>
+konsがクロージャにkarとkdrの値を保存し、<br>
+karはkarを返す関数を、kdrはkdrを返す関数をkonsに渡してやっているだけです</p>
+
+<p>(kons 1 (quote ()) はこんなクロージャを返し、</p>
+
+<ul>
+<li>kar → 1</li>
+<li>kdr → &#39;()</li>
+<li>仮引数 → (selector)</li>
+<li>関数本体 → (selector car cdr)</li>
+</ul>
+
+<p>(kons 2 (kons 1 (quote ()))はこんなクロージャを返す、というわけです</p>
+
+<ul>
+<li>kar → 2</li>
+<li>kdr → こんなクロージャ
+
+<ul>
+<li>kar → 1</li>
+<li>kdr → &#39;()</li>
+<li>仮引数 → (selector)</li>
+<li>関数本体 → (selector kar kdr)</li>
+</ul></li>
+<li>仮引数 → (selector)</li>
+<li>関数本体 → (selector kar kdr)</li>
+</ul>
+
+<p>ポインタ的な実装と同じように動いてくれそうです<br>
+考えるときは箱と矢印を使った表現でよさそうです<br>
+そうじゃないと困りますし</p>
+
+<blockquote>
+<p>konsはconsの影法師ですか。</p>
+
+<p>そうです。</p>
+
+<p>konsはconsと違っていますか。</p>
+
+<p>確かに違いますが、6章(「Scheme手習い」)で「影法師に注意」と言ったことを<br>
+忘れないで下さい。</p>
+</blockquote>
+
+<p>なぜ逆接でつながっているのかよくわかりませんが、忘れないようにしましょう</p>
+
+<p>次に、kdrを書き換えられるようにします<br>
+karを書き換えられるようにしないのは紙面の都合ってやつでしょうか<br>
+書き換えられなくっていいということはなさそうですし</p>
+
+<pre><code class="language-none">(define bons
+  (lambda (kar)
+    (let ((kdr (quote ())))
+      (lambda (selector)
+        (selector
+         (lambda (x) (set! kdr x))
+         kar
+         kdr)))))
+
+(define kar
+  (lambda (c)
+    (c (lambda (s a d) a))))
+
+(define kdr
+  (lambda (c)
+    (c (lambda (s a d) d))))
+
+(define set-kdr
+  (lambda (c x) ((c (lambda (s a d) s)) x)))
+
+(define kons
+  (lambda (a d)
+    (let ((c (bons a)))
+      (set-kdr c d)
+      c)))</code></pre>
+
+<p>konsがどうなっているのか見えないのも不便ですのでkonsを目に見えるように<br>
+表示するような関数でも作りましょう</p>
+
+<pre><code class="language-none">(define wride
+  (lambda (l)
+    (letrec ((W (lambda (l)
+                  (cond ((null? l) (display &quot;&#39;()&quot;))
+                        ((atom? l) (write l))
+                        (else
+                         (display &quot;(kons &quot;)
+                         (W (kar l))
+                         (display &quot; &quot;)
+                         (W (kdr l))
+                         (display &quot;)&quot;))))))
+      (W l)
+      (newline))))</code></pre>
+
+<p>どれどれ</p>
+
+<pre><code class="language-none">&gt; (wride (kons 1 &#39;()))
+#&lt;procedure:...hemer/chap18.rkt:8:6&gt;</code></pre>
+
+<p>ぶほ</p>
+
+<p>・・・</p>
+
+<p>konsはlambdaですがlambdaはatom?ですのでリストとは思ってもらえませんでした<br>
+まんまと影法師にしてやられています</p>
+
+<p>考えてもkonsが作ったlambdaと他のlambdaを区別する方法が思いつかなかったので<br>
+lambdaはリストってことにしました<br>
+ほんとは無茶ですが</p>
+
+<pre><code class="language-none">(define adom?
+  (lambda (s)
+    (and (atom? s) (not (procedure? s)))))
+
+(define wride
+  (lambda (l)
+    (letrec ((W (lambda (l)
+                  (cond ((null? l) (display &quot;&#39;()&quot;))
+                        ((adom? l) (write l))
+                        (else
+                         (display &quot;(kons &quot;)
+                         (W (kar l))
+                         (display &quot; &quot;)
+                         (W (kdr l))
+                         (display &quot;)&quot;))))))
+      (W l)
+      (newline))))</code></pre>
+
+<p>どうかな</p>
+
+<pre><code class="language-none">&gt; (wride (kons 1 (kons (kons 2 (kons 3 &#39;())) &#39;())))
+(kons 1 (kons (kons 2 (kons 3 &#39;())) &#39;()))</code></pre>
+
+<p>大丈夫そうです</p>
+
+<p>これで新しいkonsとset-kdrのテストがしやすくなります</p>
+
+<pre><code class="language-none">&gt; (define l (kons 1 (kons 2 &#39;())))
+&gt; (wride l)
+(kons 1 (kons 2 &#39;()))
+
+&gt; (set-kdr l (kons 2 (kons 3 &#39;())))
+&gt; (wride l)
+(kons 1 (kons 2 (kons 3 &#39;())))
+
+&gt; (wride (kdr l))
+(kons 2 (kons 3 &#39;()))
+
+&gt; (wride (kar (kdr l)))
+2</code></pre>
+
+<p>おｋぽいです</p>
+
+<p>ところでkonsを作るのになぜいったんbonsを作っているのでしょう<br>
+いきなりkonsだって作れそうですが</p>
+
+<pre><code class="language-none">(define gons
+  (lambda (kar kdr)
+      (lambda (selector)
+        (selector
+         (lambda (x) (set! kdr x))
+         kar
+         kdr))))</code></pre>
+
+<p>これでも普通に動くんですけどねえ<br>
+より小さい単位に分割したってことでしょうか</p>
+
+
+</body>
+
+</html>
