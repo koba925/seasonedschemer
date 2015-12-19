@@ -1,0 +1,242 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer17</title>
+<style>
+blockquote {
+  border-left: 4px solid #dddddd;
+  margin: 0 0;
+  padding: 0 15px;
+  color: #777777; }
+
+code {
+  margin: 0 5px;
+  padding: 0 5px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px; }
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+
+pre code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent; }
+</style>
+</head>
+<body>
+<h1 id="toc_0">Scheme修行 (17) 2つの「同じ」</h1>
+
+<p>前回のwrideはちょっと手を抜きすぎて結果が分かりづらかったのでやっぱりもうちょっとそれっぽく表示してくれるようにします</p>
+
+<pre><code class="language-none">(define wride
+  (lambda (l)
+    (letrec
+        ((R (lambda (l)
+              (W (kar l))
+              (cond ((null? (kdr l)))
+                    ((adom? (kdr l))
+                     (display &quot; . &quot;)
+                     (write (kdr l)))
+                    (else
+                     (display &quot; &quot;)
+                     (R (kdr l))))))
+         (W (lambda (l)
+              (cond ((adom? l) (write l))
+                    ((null? l) (write l))
+                    (else
+                     (display &quot;(&quot;)
+                     (R l)
+                     (display &quot;)&quot;))))))
+      (W l)
+      (newline))))</code></pre>
+
+<p>こうなります</p>
+
+<pre><code class="language-none">&gt; (wride (kons 1 (kons (kons 2 (kons 3 &#39;())) &#39;())))
+(1 (2 3))
+
+&gt; (wride (kons (kons 1 (kons 2 &#39;())) (kons 3 &#39;())))
+((1 2) 3)</code></pre>
+
+<p>いちおうこういう表示にも対応したという自己満足</p>
+
+<pre><code class="language-none">&gt; (wride (kons (kons &#39;a &#39;b) &#39;c))
+((a . b) . c)
+
+&gt; (wride (kons &#39;a (kons &#39;b &#39;c)))
+(a b . c)</code></pre>
+
+<p>さて本題</p>
+
+<pre><code class="language-none">(define lots
+  (lambda (m)
+    (cond ((zero? m) (quote ()))
+          (else (kons (quote egg) (lots (sub1 m)))))))
+
+(define add-at-end
+  (lambda (l)
+    (cond ((null? (kdr l))
+           (konsC (kar l) (kons (quote egg) (quote ()))))
+          (else
+           (konsC (kar l) (add-at-end (kdr l)))))))</code></pre>
+
+<p>konsCはconsCと同じく、呼びだされた回数を覚えているkonsです<br>
+なぜ()とkonsするところはkonsCじゃないんでしょうね？<br>
+リストの長さと関係ないから？</p>
+
+<pre><code class="language-none">&gt; (wride (add-at-end (lots 3)))
+(egg egg egg egg)
+
+&gt; (kounter)
+3</code></pre>
+
+<p>add-at-endではkonsCを3回実行していることがわかります<br>
+まるごとリストを作りなおしてますからね</p>
+
+<blockquote>
+<p>最後のkons以外には新しいkonsをせず、末尾に卵を追加することはできますか。</p>
+</blockquote>
+
+<p>set-kdrを使います</p>
+
+<pre><code class="language-none">(define add-at-end-too
+  (lambda (l)
+    (letrec ((A (lambda (l)
+                  (cond ((null? (kdr l))
+                         (set-kdr l (kons (quote egg) (quote ()))))
+                        (else
+                         (A (kdr l)))))))
+      (A l)
+      l)))</code></pre>
+
+<p>結果は同じです</p>
+
+<pre><code class="language-none">&gt; (set-kounter 0)
+&gt; (wride (add-at-end-too (lots 3)))
+(egg egg egg egg)</code></pre>
+
+<p>当然すぎるほど当然ですがkonsCは呼び出されていません</p>
+
+<pre><code class="language-none">&gt; (kounter)
+0</code></pre>
+
+<p>immutableな世界からmutableな世界に入りました<br>
+すると今までは起こらなかったようなことが起こります<br>
+konsの回数を数えてみます<br>
+（ここでは掲載のソースのkonsとkonsCを両方数えているようです）</p>
+
+<pre><code class="language-none">(define dozen (lots 12)) ; 12回
+(define bakers-dozen (add-at-end dozen)) ; 13回
+(define bakers-dozen-too (add-at-end-too dozen)) ; 1回
+(define bakers-dozen-again (add-at-end dozen)) ; 14回(!)</code></pre>
+
+<p>2行目と4行目は同じことをしているはずですがkonsの回数が違っています<br>
+本では12+13+1が27になってますがご愛嬌 この本はけっこう誤植多いです<br>
+3行目のadd-at-end-tooで、大元のdozenにひとつeggがくっついてしまったからです<br>
+くわしく見てみます</p>
+
+<p>(define dozen (lots 12))を実行すると卵が12個できます</p>
+
+<pre><code class="language-none">dozen
+  ↓
+ egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;()</code></pre>
+
+<p>(define bakers-dozen (add-at-end dozen))はdozenのコピーを作ってから<br>
+卵をひとつ追加します<br>
+コピーなので元のdozenには影響は与えません</p>
+
+<pre><code class="language-none">dozen
+  ↓
+ egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;()
+
+bakers-dozen
+  ↓
+ egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;()</code></pre>
+
+<p>(define bakers-dozen-too (add-at-end-too dozen))はdozenを末尾まで<br>
+たどってそこに卵を追加します<br>
+bakers-dozen-tooはもちろん13個の卵を指しますが、元のdozenまで13個の卵を<br>
+指すようになってしまいます</p>
+
+<pre><code class="language-none">dozen
+  ↓
+ egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;()
+  ↑
+bakers-dozen-too
+
+bakers-dozen
+  ↓
+ egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;()</code></pre>
+
+<p>(define bakers-dozen-again (add-at-end dozen))は、13個になった<br>
+dozenをコピーしてから末尾に卵を追加するのでkonsCが14回呼ばれることになります</p>
+
+<pre><code class="language-none">dozen
+  ↓
+ egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;()
+  ↑
+bakers-dozen-too
+
+bakers-dozen
+  ↓
+ egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;()
+
+bakers-dozen-again
+  ↓
+ egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;()</code></pre>
+
+<p>さて</p>
+
+<blockquote>
+<p>(set! ...)を導入すると、「同じこと」について新しい考え方ができます。</p>
+</blockquote>
+
+<p>dozenとbakers-dozenはどちらも13個の卵を指しています<br>
+set!を使わないかぎり、dozenとbakers-dozenを区別する必要はありませんでした</p>
+
+<blockquote>
+<p>2つのkonsは、片方を変えるともう片方も変わるなら、同じものです。</p>
+</blockquote>
+
+<p>アドレスやポインタを前提にして話すのではないとするとこういう言い方になるんでしょうね<br>
+dozenとbakers-dozen-tooは全く同じものを指しています<br>
+bakers-dozen-tooを変えるとdozenも変わってしまいます</p>
+
+<p>そのまま実装した「同じ」判定器です<br>
+実用上の価値はほとんどないと思います</p>
+
+<pre><code class="language-none">(define same?
+  (lambda (c1 c2)
+    (let ((t1 (kdr c1))
+          (t2 (kdr c2)))
+      (set-kdr c1 1)
+      (set-kdr c2 2)
+      (let ((v (= (kdr c1) (kdr c2))))
+        (set-kdr c1 t1)
+        (set-kdr c2 t2)
+        v))))</code></pre>
+
+<p>本には(same? bakers-dozen bakers-dozen-too)が#tと書いてありますが</p>
+
+<pre><code class="language-none">&gt; (same? dozen bakers-dozen-too)
+#t
+
+&gt; (same? bakers-dozen bakers-dozen-too)
+#f</code></pre>
+
+<p>そこは間違っちゃいかんとこでしょ・・・</p>
+
+
+</body>
+
+</html>
