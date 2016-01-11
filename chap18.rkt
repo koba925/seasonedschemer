@@ -202,3 +202,57 @@
 (newline)
 (same? dozen bakers-dozen-too)
 (same? bakers-dozen bakers-dozen-too)
+
+(define last-kons
+  (lambda (ls)
+    (cond ((null? (kdr ls)) ls)
+          (else (last-kons (kdr ls))))))
+
+(define finite-lenkth
+  (lambda (p)
+    (let/cc infinite
+      (letrec ((C (lambda (p q)
+                    (cond ((same? p q) (infinite #f))
+                          ((null? q) 0)
+                          ((null? (kdr q)) 1)
+                          (else (+ (C (sl p) (qk q)) 2)))))
+               (qk (lambda (x) (kdr (kdr x))))
+               (sl (lambda (x) (kdr x))))
+        (cond ((null? p) 0)
+              (else (add1 (C p (kdr p)))))))))
+
+(define finite-lenkth1
+  (lambda (p)
+    (letrec ((C (lambda (q)
+                  (cond ((null? q) 0)
+                        ((null? (kdr q)) 1)
+                        (else (+ (C (qk q)) 2)))))
+             (qk (lambda (x) (kdr (kdr x)))))
+      (cond ((null? p) 0)
+            (else (add1 (C (kdr p))))))))
+
+(define lenkth2
+  (lambda (q)
+    (cond ((null? q) 0)
+          ((null? (kdr q)) 1)
+          (else (+ (lenkth2 (kdr (kdr q))) 2)))))
+
+(define long (lots 12))
+
+(newline)
+(wride long)
+(wride (last-kons long))
+(lenkth long)
+(finite-lenkth long)
+(finite-lenkth1 long)
+(lenkth2 long)
+
+(set-kdr (last-kons long) long)
+(finite-lenkth long)
+
+(set! long (lots 12))
+(set-kdr (last-kons long) (kdr (kdr long)))
+;(wride long)
+;(lenkth long)
+(finite-lenkth long)
+

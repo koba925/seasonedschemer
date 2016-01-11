@@ -1,0 +1,209 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer18</title>
+
+<style>
+blockquote {
+  border-left: 4px solid #dddddd;
+  margin: 0 0;
+  padding: 0 15px;
+  color: #777777; }
+
+code {
+  margin: 0 5px;
+  padding: 0 5px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px; }
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+
+pre code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent; }
+</style>
+</head>
+<body>
+<h1 id="toc_0">Scheme修行 (18) ループしたリスト</h1>
+
+<p>最後のkonsを取り出すlast-konsです</p>
+
+<pre><code class="language-none">(define last-kons
+  (lambda (ls)
+    (cond ((null? (kdr ls)) ls)
+          (else (last-kons (kdr ls))))))</code></pre>
+
+<p>なんのへんてつもありません</p>
+
+<pre><code class="language-none">&gt; (define long (lots 12))
+&gt; (wride long)
+(egg egg egg egg egg egg egg egg egg egg egg egg)
+
+&gt; (wride (last-kons long))
+(egg)
+
+&gt; (lenkth long)
+12</code></pre>
+
+<p>longをいじってやります</p>
+
+<pre><code class="language-none">&gt; (set-kdr (last-kons long) long)
+&gt; (lenkth long)
+このプログラムはメモリを使いきりました。
+Interactions disabled
+&gt; (wride egg)
+(egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg
+egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg
+egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg
+egg egg egg egg egg ...</code></pre>
+
+<p>longは最初こうでした</p>
+
+<pre><code class="language-none">long
+ ↓
+egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;() </code></pre>
+
+<p>(set-kdr (last-kons long) long)を実行した後はこうなってます</p>
+
+<pre><code class="language-none">long
+ ↓
+egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg
+ ↑                                                      |
+ +------------------------------------------------------+</code></pre>
+
+<p>ので、kdrを順番にたどっていくといつまでたっても終わりになりません<br>
+こうしても同じ</p>
+
+<pre><code class="language-none">&gt; (define long (lots 12))
+&gt; (set-kdr (last-kons long) (kdr (kdr long)))
+&gt; (lenkth long)
+このプログラムはメモリを使いきりました。
+Interactions disabled
+&gt; (wride egg)
+(egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg
+egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg
+egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg egg
+egg egg egg egg egg ...</code></pre>
+
+<p>こんどはこういう絵になってます</p>
+
+<pre><code class="language-none">long
+ ↓
+egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg-&gt;egg
+           ↑                                            |
+           +--------------------------------------------+</code></pre>
+
+<p>絵で書いてごまかしましたが本当はクロージャです<br>
+んーとどう書くといいかな・・・</p>
+
+<pre><code class="language-none">(仮引数→(selector) 関数本体→(selector kar kdr) kar→egg kdr→
+  (仮引数→(selector) 関数本体→(selector kar kdr) kar→egg kdr→
+あ→ (仮引数→(selector) 関数本体→(selector kar kdr) kar→egg kdr→
+      (仮引数→(selector) 関数本体→(selector kar kdr) kar→egg kdr→
+         ...
+                (仮引数→(selector) 関数本体→(selector kar kdr) kar→egg kdr→あ))...)</code></pre>
+
+<p>書けばよく分かるってものでもないかな</p>
+
+<p>そんなリストだったら#fを返し、普通のリストだったら長さを返す関数finite-lenkthです</p>
+
+<pre><code class="language-none">(define finite-lenkth
+  (lambda (p)
+    (let/cc infinite
+      (letrec ((C (lambda (p q)
+                    (cond ((same? p q) (infinite #f))
+                          ((null? q) 0)
+                          ((null? (kdr q)) 1)
+                          (else (+ (C (sl p) (qk q)) 2)))))
+               (qk (lambda (x) (kdr (kdr x))))
+               (sl (lambda (x) (kdr x))))
+        (cond ((null? p) 0)
+              (else (add1 (C p (kdr p)))))))))</code></pre>
+
+<p>なんでしょうこれは？<br>
+本体はCで、Cを呼ぶたびにpはリスト内を１つ進み、qは2つ進む？<br>
+でpとqが同じだったら終わる？<br>
+ループができてる場合はどう動くのかな？</p>
+
+<p>よくわからないので動かしてみます<br>
+まずは普通のリストから</p>
+
+<pre><code class="language-none">   1 -&gt; 2 -&gt; 3 -&gt; 4 -&gt; 5 -&gt; 6 -&gt; 7 -&gt; ()
+0  p    q                                +1
+1       p         q                      +2
+2            p              q            +2
+3                 p                   q  +2</code></pre>
+
+<p>ここで(null? q)なのでCが0を返し、0+2+2+2+1で7になる、と</p>
+
+<p>ああ、qの方だけ見るとちょっと変わったlenkth関数に見えますね</p>
+
+<pre><code class="language-none">(define finite-lenkth1
+  (lambda (p)
+    (letrec ((C (lambda (q)
+                  (cond ((null? q) 0)
+                        ((null? (kdr q)) 1)
+                        (else (+ (C (qk q)) 2)))))
+             (qk (lambda (x) (kdr (kdr x)))))
+      (cond ((null? p) 0)
+            (else (add1 (C (kdr p))))))))</code></pre>
+
+<p>さらに単純化すると</p>
+
+<pre><code class="language-none">(define lenkth2
+  (lambda (q)
+    (cond ((null? q) 0)
+          ((null? (kdr q)) 1)
+          (else (+ (lenkth2 (kdr (kdr q))) 2)))))</code></pre>
+
+<p>普通のlenkthと見比べます</p>
+
+<pre><code class="language-none">(define lenkth
+  (lambda (l)
+    (cond ((null? l) 0)
+          (else (add1 (lenkth (kdr l)))))))</code></pre>
+
+<p>lenkth2のほうは２つずつ進めているので、</p>
+
+<ul>
+<li>2ずつ足している</li>
+<li>qがnull?かどうかだけでなく、(kdr q)がnull?かどうかもチェックしている</li>
+</ul>
+
+<p>という違いがあるだけですね</p>
+
+<p>では、ループができている場合について確認します</p>
+
+<pre><code class="language-none">        +------------------------+
+        ↓                        |
+   1 -&gt; 2 -&gt; 3 -&gt; 4 -&gt; 5 -&gt; 6 -&gt; 7
+0  p    q
+1       p         q
+2            p              q
+3       q         p
+4                 q    p
+5                          p,q</code></pre>
+
+<p>で(same? p q)となって#fを返すというわけかー<br>
+qはとびとびに進んでいるのですれ違ったりしないかと思いましたが<br>
+pがひとつずつ、qがふたつずつ進んでいるので差がひとつずつ縮まっていくだけだから<br>
+心配いらなかったですね</p>
+
+<p>うまいこと考えるもんだなあ<br>
+てっきりO(n^2)かと思ったけどO(n)で済むのかー</p>
+
+
+</body>
+
+</html>
