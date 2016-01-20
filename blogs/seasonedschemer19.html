@@ -1,0 +1,244 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer19</title>
+
+</head>
+<body>
+<h1 id="toc_0">Scheme修行 (19) 継続と収集子</h1>
+
+<p>deepです</p>
+
+<pre><code class="language-none">(define deep
+  (lambda (m)
+    (cond ((zero? m) (quote pizza))
+          (else (cons (deep (sub1 m)) (quote ()))))))</code></pre>
+
+<p>(deep 6)としてやると((((((pizza))))))ができますが<br>
+((((((pizza))))))ではなく((((((mozzarella))))))を作るにはどうしたら<br>
+いいでしょうか</p>
+
+<p>話の流れ上、引数にするだけじゃない？とは言ってはいけないようです<br>
+こうです</p>
+
+<pre><code class="language-none">(define six-layers
+  (lambda (p)
+    (cons
+     (cons
+      (cons
+       (cons
+        (cons
+         (cons p (quote ()))
+         (quote ()))
+        (quote ()))
+       (quote ()))
+      (quote ()))
+     (quote ()))))</code></pre>
+
+<p>(deep 4)にあたるものはこれ</p>
+
+<pre><code class="language-none">(define four-layers
+  (lambda (p)
+    (cons
+     (cons
+      (cons
+       (cons p (quote ()))
+       (quote ()))
+      (quote ()))
+     (quote ()))))</code></pre>
+
+<blockquote>
+<p>もっと簡単な方法はないですか。</p>
+</blockquote>
+
+<p>そうですねえ</p>
+
+<blockquote>
+<p>あります。</p>
+</blockquote>
+
+<p>でも引数に持たせるだけではありません</p>
+
+<blockquote>
+<p>13章の(letcc ...)を覚えていますか。<br>
+はい。<br>
+それが役に立ちます。<br>
+まだ(letcc ...)の全貌を見ていなかったという意味でしょうか。<br>
+半分も見ていません。</p>
+</blockquote>
+
+<p>こうです</p>
+
+<pre><code class="language-none">(define toppings #f)
+(define deepB
+  (lambda (m)
+    (cond ((zero? m)
+           (let/cc jump
+             (set! toppings jump)
+             (quote pizza)))
+          (else (cons (deepB (sub1 m)) (quote ()))))))</code></pre>
+
+<p>let/ccを呼んでいますが、jumpは覚えておくだけで使われていません<br>
+実行してみましょう<br>
+toppings(つまりjump)を関数のように使います<br>
+(toppings A)を評価すると、あたかもlet/ccがAを返したかのような振りをして、<br>
+さらにlet/ccが評価された後の作業を繰り返します</p>
+
+<pre><code class="language-none">&gt; (deepB 6)
+&#39;((((((pizza))))))
+
+&gt; (toppings (quote mozzarella))
+&#39;((((((mozzarella))))))
+
+&gt; (toppings (quote cake))
+&#39;((((((cake))))))
+
+&gt; (toppings (quote pizza))
+&#39;((((((pizza))))))</code></pre>
+
+<p>こういうわけです</p>
+
+<p>では、</p>
+
+<blockquote>
+<p>ケーキにもう一段を加えてみましょう。</p>
+</blockquote>
+
+<pre><code class="language-none">&gt; (cons (toppings (quote cake)) (quote ()))
+&#39;((((((cake))))))</code></pre>
+
+<blockquote>
+<p>きちんと動作しません。</p>
+</blockquote>
+
+<p>そうですね</p>
+
+<blockquote>
+<p>「(toppings m) を使うたびに、それは周りのすべてを忘れて、<br>
+ちょうど6段のカッコを加えます。</p>
+</blockquote>
+
+<p>後でやろうとしていたこと（ここではcons）のことを完全に忘れて<br>
+let/ccが評価された後の作業（6段のカッコを加える）を始めてしまい、<br>
+その勢いでREPLにまで戻ってきてしまうということですね</p>
+
+<p>うまく使えるんでしょうかこの機能・・・<br>
+使えるんでしょうけど</p>
+
+<blockquote>
+<p>第20の戒律<br>
+(letcc ...) を用いて作られた値を考えるに際しては、同等ではあるが<br>
+忘れない関数を書き記すべし。そのあと、それを使用する際には、<br>
+忘れることを覚えておくべし。</p>
+</blockquote>
+
+<p>忘れない関数って何でしょうか</p>
+
+<p>ここで懐かしの&amp;coの登場です</p>
+
+<pre><code class="language-none">(define deep&amp;co
+  (lambda (m k)
+    (cond ((zero? m) (k (quote pizza)))
+          (else (deep&amp;co (sub1 m)
+                         (lambda (x) (k (cons x (quote ())))))))))</code></pre>
+
+<p>動きます</p>
+
+<pre><code class="language-none">&gt; (deep&amp;co 0 (lambda (x) x))
+&#39;pizza
+
+&gt; (deep&amp;co 6 (lambda (x) x))
+&#39;((((((pizza))))))
+
+&gt; (deep&amp;co 2 (lambda (x) x))
+&#39;((pizza))</code></pre>
+
+<p>(deep&amp;co 2 (lambda (x) x)) を追いかけてみます</p>
+
+<pre><code class="language-none">  (deep&amp;co 2 (lambda (x) x))
+= (deep&amp;co 1 (lambda (x) (k (cons x (quote ())))))
+　  ※ kは(lambda (x) x)
+= (deep&amp;co 0 (lambda (x) (k (cons x (quote ())))))
+　  ※ kは(lambda (x) (k2 (cons x (quote ()))))
+　  ※ k2は(lambda (x) x)
+= (deep&amp;co 0 K) ※とおく
+= (K (quote pizza))</code></pre>
+
+<p>式の置き換えがうまくいっているかどうかはこんな感じで確かめられます</p>
+
+<pre><code class="language-none">&gt; (let ((k2 (lambda (x) x)))
+    (let ((k (lambda (x) (k2 (cons x (quote ()))))))
+      (deep&amp;co 0 (lambda (x) (k (cons x (quote ())))))))
+&#39;((pizza))</code></pre>
+
+<p>さらに続けると</p>
+
+<pre><code class="language-none">k = (lambda (x) (k2 (cons x (quote ()))))
+  = (lambda (x) ((lambda (x) x) (cons x (quote ()))))
+  = (lambda (x) (cons x (quote ())))
+
+K = (lambda (x) (k (cons x (quote ()))))
+  = (lambda (x) ((lambda (x) (cons x (quote ()))) (cons x (quote ()))))
+  = (lambda (x) (cons (cons x (quote ())) (quote ())))
+
+(K (quote pizza)) = &#39;((pizza))
+</code></pre>
+
+<p>となります<br>
+よく見るとKは次のtwo-layersと同じであることがわかります</p>
+
+<pre><code class="language-none">(define two-layers
+  (lambda (p)
+    (cons
+      (cons p (quote ()))
+    (quote ()))))</code></pre>
+
+<p>deepからdeepBを作ったようにして、deep&amp;coからdeep&amp;coBを作ります</p>
+
+<pre><code class="language-none">(define deep&amp;coB
+  (lambda (m k)
+    (cond ((zero? m)
+           (let ()
+             (set! toppings k)
+             (k (quote pizza))))
+          (else
+           (deep&amp;coB (sub1 m)
+                     (lambda (x) (k (cons x (quote ())))))))))</code></pre>
+
+<p>deepBと同じように使えます</p>
+
+<pre><code class="language-none">&gt; (deep&amp;coB 2 (lambda (x) x))
+&#39;((pizza))
+
+&gt; (toppings (quote pizza))
+&#39;((pizza))</code></pre>
+
+<p>mが0のとき<code>(set! toppings k)</code>すること以外はdeep&amp;coと同じです<br>
+<code>(set! toppings k)</code>するとtoppingsはさきほどのK、つまりtwo-layersになります<br>
+(deep&amp;coB 6 (lambda (x) x))を評価すればsettingsはsix-layersに、<br>
+(deep&amp;coB 4 (lambda (x) x))を評価すればsettingsはfour-layersになります</p>
+
+<blockquote>
+<p>それはつまり、最後の収集子は、deepBの中で(letcc ...)によって作られたものと<br>
+同等な関数に関係しているということですか。</p>
+
+<p>はい。最後の収集子は、(letcc ...)が作った値の影法師です。</p>
+</blockquote>
+
+<p>手習いで収集子が出てきたとき、「継続」と呼ばれることもありますと書いてありましたが<br>
+実際どこまで同じなのか、ちょっともやっとした気分でした<br>
+基本的に同じものであることがわかってすっきりです</p>
+
+<p>ただし今度はtoppingsの上にトッピングを積み重ねることができます</p>
+
+<pre><code class="language-none">&gt; (cons (toppings (quote cake)) (quote ()))
+&#39;(((cake)))</code></pre>
+
+<p>たぶん、これが「忘れない関数」なのでしょう<br>
+なぜこれを書き記すべきなのかは考えてもわかりませんでした</p>
+
+
+</body>
+
+</html>
