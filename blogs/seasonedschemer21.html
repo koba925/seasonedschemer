@@ -1,0 +1,211 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer21</title>
+
+</head>
+<body>
+<h1 id="toc_0">Scheme修行 (21) ジェネレータ？（後編）</h1>
+
+<p>前回のwaddleはもともと再帰がややこしいところにlet/ccが入ったので<br>
+なんだかよくわからないことになってましたが<br>
+leaveとfillだけの話ならこんな感じでぴょんぴょんさせることができます</p>
+
+<div><pre><code class="language-none">(define A
+  (lambda ()
+    (let/cc here (set! leave here)
+      (display &quot;A1&quot;) (newline)
+      (B))
+    (let/cc here (set! leave here)
+      (display &quot;A2&quot;) (newline)
+      (fill))
+    (let/cc here (set! leave here)
+      (display &quot;A3&quot;) (newline)
+      (fill))
+    (display &quot;A4&quot;) (newline)))
+
+(define B
+  (lambda ()
+    (let/cc here (set! fill here)
+      (display &quot;B1&quot;) (newline)
+      (leave))
+    (let/cc here (set! fill here)
+      (display &quot;B2&quot;) (newline)
+      (leave))
+    (let/cc here (set! fill here)
+      (display &quot;B3&quot;) (newline)
+      (leave))))</code></pre></div>
+
+<p>get-firstの最後のleaveに相当するものはどこへ行ってしまったのか少し心配ですが<br>
+思った通りには動いてくれます</p>
+
+<div><pre><code class="language-none">&gt; (A)
+A1
+B1
+A2
+B2
+A3
+B3
+A4</code></pre></div>
+
+<p>こういうのをたぶんコルーチンとも言います</p>
+
+<p>もっとよく理解するために、収集子を使った形に直してみます<br>
+忘れない関数を覚えおくべし、って言ってましたしね（意味がよくわかってないけど）</p>
+
+<div><pre><code class="language-none">(define get-first&amp;co
+  (lambda (l)
+    (let ((here (lambda (x) x)))
+      (set! leave here)
+      (waddle&amp;co l here))))
+
+(define get-next&amp;co
+  (lambda ()
+    (let ((here-again (lambda (x) x)))
+      (set! leave here-again)
+      (fill (quote go)))))
+
+(define waddle&amp;co
+  (lambda (l col)
+    (cond ((null? l) (col (quote ())))
+          ((atom? (car l))
+           (let ((rest (lambda (x) (waddle&amp;co (cdr l) col))))
+             (set! fill rest)
+             (leave (car l))))
+          (else (waddle&amp;co
+                 (car l)
+                 (lambda (x) (waddle&amp;co (cdr l) col)))))))</code></pre></div>
+
+<p>なんとなくこんな感じかな、と思って書いてみたら動いてしまって<br>
+なぜちゃんと動くのかちっともわかりません<br>
+もしかしたらたまたまかも</p>
+
+<p>さらに削って、途中で脱出しない版を作ってみます<br>
+これはScheme手習いの復習ですね</p>
+
+<div><pre><code class="language-none">(define waddle&amp;co
+  (lambda (l col)
+    (cond ((null? l) (col (quote ())))
+          ((atom? (car l))
+           (display (car l)) (newline)
+           (waddle&amp;co (cdr l) col))
+          (else (waddle&amp;co (car l) (lambda (x) (waddle&amp;co (cdr l) col)))))))</code></pre></div>
+
+<p>何もしないと途中何が起こっているのかわからないのでdisplayを入れました<br>
+(((a)) b)に適用してみます</p>
+
+<div><pre><code class="language-none">(waddle&amp;co &#39;(((a)) b) (lambda (x) x))
+(waddle&amp;co &#39;((a)) (lambda (x) (waddle&amp;co &#39;(b) (lambda (x) x))))
+(waddle&amp;co &#39;(a) (lambda (x) (waddle&amp;co &#39;()
+                  (lambda (x) (waddle&amp;co &#39;(b) (lambda (x) x))))))
+; (display &#39;a) (newline)
+(waddle&amp;co &#39;() (lambda (x) (waddle&amp;co &#39;()
+                 (lambda (x) (waddle&amp;co &#39;(b) (lambda (x) x))))))
+((lambda (x) (waddle&amp;co &#39;()
+   (lambda (x) (waddle&amp;co &#39;(b) (lambda (x) x))))) (quote ()))
+(waddle&amp;co &#39;() (lambda (x) (waddle&amp;co &#39;(b) (lambda (x) x))))
+((lambda (x) (waddle&amp;co &#39;(b) (lambda (x) x))) (quote ()))
+(waddle&amp;co &#39;(b) (lambda (x) x))
+; (display &#39;b) (newline)
+(waddle&amp;co &#39;() (lambda (x) x))
+((lambda (x) x) (quote ()))
+(quote ())</code></pre></div>
+
+<p>colの値は捨てられるだけなのであまり複雑にならず多少追いかけやすいです</p>
+
+<p>もとの定義では、この流れがところどころでぶったぎられる形になっているはず</p>
+
+<div><pre><code class="language-none">(get-first&amp;co &#39;(((a)) b))
+; (set leave (lambda (x) x))
+(waddle&amp;co &#39;(((a)) b) (lambda (x) x))
+(waddle&amp;co &#39;((a)) (lambda (x) (waddle&amp;co &#39;(b) (lambda (x) x))))
+(waddle&amp;co &#39;(a) (lambda (x) (waddle&amp;co &#39;()
+                  (lambda (x) (waddle&amp;co &#39;(b) (lambda (x) x))))))
+; (set fill (lambda (x) (waddle&amp;co &#39;()
+;             (lambda (x) (waddle&amp;co &#39;(b) (lambda (x) x))))))
+(leave &#39;a)
+((lambda (x) x) &#39;a)
+&#39;a
+
+(get-next&amp;co)
+; (set leave (lambda (x) x))
+(fill (quote go))
+((lambda (x) (waddle&amp;co &#39;()
+   (lambda (x) (waddle&amp;co &#39;(b) (lambda (x) x))))) (quote go))
+(waddle&amp;co &#39;() (lambda (x) (waddle&amp;co &#39;(b) (lambda (x) x))))
+((lambda (x) (waddle&amp;co &#39;(b) (lambda (x) x))) (quote ()))
+(waddle&amp;co &#39;(b) (lambda (x) x))
+; (set fill (lambda (x) (waddle&amp;co &#39;() (lambda (x) x))))
+(leave &#39;b)
+((lambda (x) x) &#39;b)
+&#39;b
+
+(get-next&amp;co)
+; (set leave (lambda (x) x))
+(fill (quote go))
+((lambda (x) (waddle&amp;co &#39;() (lambda (x) x))) (quote go))
+(waddle&amp;co &#39;() (lambda (x) x))
+((lambda (x) x) (quote ()))
+(quote ())
+&#39;()</code></pre></div>
+
+<p>ふむ<br>
+そんな感じですね</p>
+
+<p>脱出のためのしくみは何も使っていないのに、同じことができてるのが面白いです<br>
+収集子を使う形にしたとき、全体が末尾再帰の形になったから、かな<br>
+lambdaすげえ</p>
+
+<p>ちゃんと動くし変なコードを書いてたりするわけでもなさそうです<br>
+でもまだ収集子が育って評価される様子がぱっとイメージできるところまではいってないんだよなー<br>
+半分機械的に書きなおしてみたら意外とうまくいった、て感じは拭えない</p>
+
+<p>さてここまでわかればもう（やっと）two-in-a-row*?は目前です<br>
+ついでに第13の戒律を適用します</p>
+
+<div><pre><code class="language-none">(define two-in-a-row*?
+  (letrec
+      ((T? (lambda (a)
+             (let ((n (get-next (quote ()))))
+               (if (atom? n)
+                   (or (eq? n a) (T? n))
+                   #f))))
+       (get-next (lambda (x)
+                   (let/cc here-again
+                     (set! leave here-again)
+                     (fill (quote go)))))
+       (fill (lambda (x) x))
+       (waddle (lambda (l)
+                 (cond ((null? l) (quote ()))
+                       ((atom? (car l))
+                        (let ()
+                          (let/cc rest
+                            (set! fill rest)
+                            (leave (car l)))
+                          (waddle (cdr l))))
+                       (else (let ()
+                               (waddle (car l))
+                               (waddle (cdr l)))))))
+       (leave (lambda (x) x)))
+    (lambda (l)
+      (let ((fst (let/cc here
+                   (set! leave here)
+                   (waddle l)
+                   (leave (quote ())))))
+        (if (atom? fst) (T? fst) #f)))))</code></pre></div>
+
+<p>本には(get-next 0)というのが1箇所だけ出てきますがなんですかね<br>
+たぶん書き間違いじゃないかと</p>
+
+<p>さてこれって継続使わなかったらどう書けるんですかね<br>
+やってみましょう</p>
+
+<p>あれ？<br>
+なんか難しい？<br>
+これは宿題！</p>
+
+
+</body>
+
+</html>

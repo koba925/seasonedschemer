@@ -1,0 +1,391 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer20</title>
+
+</head>
+<body>
+<h1 id="toc_0">Scheme修行 (20) ジェネレータ？（前編）</h1>
+
+<p>two-in-a-row?です</p>
+
+<div><pre><code class="language-none">(define two-in-a-row?
+  (letrec ((W (lambda (a lat)
+                (cond ((null? lat) #f)
+                      (else (let ((nxt (car lat)))
+                              (or (eq? nxt a)
+                                  (W nxt (cdr lat)))))))))
+    (lambda (lat)
+      (cond ((null? lat) #f)
+            (else (W (car lat) (cdr lat)))))))</code></pre></div>
+
+<p>two-in-a-row*?を作ります<br>
+latじゃなくて一般のリストを相手にするやつです</p>
+
+<p>まずはこういうのを考えてみます</p>
+
+<div><pre><code class="language-none">(define leave #f)
+(define fill #f)
+
+(define waddle
+  (lambda (l)
+    (cond ((null? l) (quote ()))
+          ((atom? (car l))
+           (let ()
+             (let/cc rest
+               (set! fill rest)
+               (leave (car l)))
+             (waddle (cdr l))))
+          (else (let ()
+                  (waddle (car l))
+                  (waddle (cdr l)))))))
+
+(define start-it2
+  (lambda (l)
+    (let/cc here
+      (set! leave here)
+      (waddle l))))
+
+(define get-next
+  (lambda (x)
+    (let/cc here-again
+      (set! leave here-again)
+      (fill (quote go)))))</code></pre></div>
+
+<p>なんでしょうかこれは<br>
+実行してみます</p>
+
+<div><pre><code class="language-none">&gt; (start-it2 &#39;((donuts) (cheerios (cheerios (spaghettios))) donuts))
+&#39;donuts
+
+&gt; (get-next (quote go))
+&#39;cheerios
+
+&gt; (get-next (quote go))
+&#39;cheerios
+
+&gt; (get-next (quote go))
+&#39;spaghettios
+
+&gt; (get-next (quote go))
+&#39;donuts
+
+&gt; (get-next (quote go))
+&#39;()</code></pre></div>
+
+<p>どうやらリストの左から順にアトムを取り出してくれるようです<br>
+start-it2が最初のアトムを取り出し、get-nextで次々とアトムを取ってくる<br>
+実にいい感じです</p>
+
+<p>どういうしくみなんでしょうか<br>
+start-it2はこうです</p>
+
+<ol>
+<li>leaveに現在の継続をセットして</li>
+<li>((donuts) (cheerios (cheerios (spaghettios))) donuts)にwaddleを適用する</li>
+</ol>
+
+<p>waddleがdonutsに達するとこうなります</p>
+
+<ol>
+<li>restに現在の継続をセットして</li>
+<li>donutsにleaveを適用する</li>
+</ol>
+
+<p>するとleaveがstart-it2の続きを実行しますのでstart-it2がdonutsを返すというわけですね</p>
+
+<p>このときのrestはどんなものでしょうか</p>
+
+<blockquote>
+<p>restに相当する関数を定義できますか。</p>
+
+<p>問題ありません。</p>
+
+<p><code>(define rest1 (lambda (x) (waddle l1)))</code></p>
+
+<p>ここで</p>
+
+<p>l1は<code>(() (cheerios (cheerios (spaghettios))) donuts)</code>です。</p>
+</blockquote>
+
+<p>ここが評価される時点でのlは(donuts)ですのでホントは違う気がしますが<br>
+全体の流れの中ではそうとも言えるでしょうか<br>
+ひとつめのアトムの処理が済んだところ、ということですね</p>
+
+<p>次にget-nextを呼ぶと</p>
+
+<ol>
+<li>leaveに現在の継続をセットして</li>
+<li>goにfillを適用する</li>
+</ol>
+
+<p>leaveは、後でここに戻ってくるために使われているっぽいですね</p>
+
+<p>fillを呼ぶと、さきほど中断したところから実行が再開されます<br>
+渡された値(go)はlet/ccの値となりますが、何も使われずに捨てられています<br>
+上のrestが引数のxを使っていないことに対応します</p>
+
+<p>waddleがcheeriosに達すると</p>
+
+<ol>
+<li>restに現在の継続をセットして</li>
+<li>donutsにleaveを適用する</li>
+</ol>
+
+<p>するとleaveがget-nextの続きを実行しますのでget-nextがcheeriosを返してくれます<br>
+その調子でget-nextはcheerios、spaghettios、donutsを返してくれますが<br>
+最後にget-nextを呼ぶと</p>
+
+<blockquote>
+<p>わお！</p>
+</blockquote>
+
+<p>何がわおなんでしょうか</p>
+
+<blockquote>
+<p>waddleはついに(null? l)にたどり着きます。</p>
+</blockquote>
+
+<p>そうですね</p>
+
+<blockquote>
+<p>ともあれ、最後の値は()です。</p>
+</blockquote>
+
+<p>そうでした<br>
+何が問題なのでしょうか<br>
+いいじゃないですか()で</p>
+
+<blockquote>
+<p>もし、しようとしていたことがすべて終わったのなら、最初に(start-it l)の<br>
+値を尋ねたところに戻るはずです。</p>
+</blockquote>
+
+<p>・・・よくわかりません</p>
+
+<p>leaveとかfillで流れが分断されてはいるものの<br>
+leaveとかfillでジャンプする前には必ず現在の場所を覚えてて<br>
+後でその直後に戻ってくるようにはなっているので<br>
+いつかは元の場所に戻るんだよといわれればそのとおり</p>
+
+<p>でも1行ずつ追うように読んでいくとかえってわかりにくくなります<br>
+順番に呼んでいくところはイメージしやすいですが戻るところはイメージしづらい</p>
+
+<p>具体例でキッチリ読んでいってみます<br>
+元の引数だと大変そうなので簡単な引数で</p>
+
+<div><pre><code class="language-none">(start-it2 &#39;(a b))</code></pre></div>
+
+<p>このあとどう書くとすっきりするのか考えてみましたがいいアイデアがありません<br>
+だらだら書いていきます</p>
+
+<p>これはこうなります</p>
+
+<div><pre><code class="language-none">(letcc here
+  (set! leave here)
+  (waddle &#39;(a b)))</code></pre></div>
+
+<p>そうするとまず「leaveに現在の継続をセットする」わけですが<br>
+「現在の継続」ってなんでしょうか<br>
+どこに戻るかってことを考えるには具体的にしておかなくてはなりません<br>
+関数の定義に遡ると(@はマークとして挿入)</p>
+
+<div><pre><code class="language-none">(define start-it2
+  (lambda (l)
+    (let/cc here
+      (set! leave here)
+      (waddle l)))@)</code></pre></div>
+
+<p>leaveの引数を(let/cc ...)の値として、@のところから実行を再開する<br>
+というのがleaveの内容と言えそうです</p>
+
+<p>今は終わり方を調べようとしてますので<br>
+実行を再開した後はどこまで実行されて終わるのかも気になります<br>
+この場合、すぐREPLに値を返してしまうのでそこで終わるしかありませんが<br>
+これ以外でもREPLに戻るまで実行が続くということでいいんでしょうか<br>
+そういうことにしておきます</p>
+
+<ol>
+<li>leaveの引数を(let/cc ...)の値として、@のところ(let/ccの直後)から実行を再開する</li>
+<li>（何もすることがないのでそのまま）REPLに値を返す（終了）</li>
+</ol>
+
+<p>という理解です</p>
+
+<p>次は(waddle &#39;(a b))を評価します<br>
+(waddle &#39;(a b))を評価し終えれば、その値が(start-it2 &#39;(a b))の値にもなるはずですが<br>
+どうでしょうか</p>
+
+<p>(waddle &#39;(a b))はこうなります</p>
+
+<div><pre><code class="language-none">(let ()
+  (let/cc rest
+    (set! fill rest)
+    (leave &#39;a))
+  (waddle &#39;(b))))</code></pre></div>
+
+<p>さっきと同じように考えるとfillにはこんな継続が設定されるはず</p>
+
+<ol>
+<li>fillの引数を(let/cc ...)の値とするけれども誰も見ていないので捨てる</li>
+<li>(waddle &#39;(b))から実行を再開する</li>
+<li>その値を(start-it2 &#39;(a b))に返す</li>
+<li>(start-it2 &#39;(a b))はその値をREPLに返す（終了）</li>
+</ol>
+
+<p>そしてleaveです<br>
+さっき覚えた継続を実行しますので</p>
+
+<p>(let/cc ...)の値がaとなり、それがREPLに返されて終了です<br>
+合ってます</p>
+
+<p>次です</p>
+
+<div><pre><code class="language-none">(get-next (quote go))</code></pre></div>
+
+<p>はこうです</p>
+
+<div><pre><code class="language-none">(let/cc here-again
+  (set! leave here-again)
+  (fill (quote go)))</code></pre></div>
+
+<p>leaveはこういう継続</p>
+
+<ol>
+<li>leaveの引数を(let/cc ...)の値として、let/ccの直後から実行を再開する</li>
+<li>（何もすることがないのでそのまま）REPLに値を返す（終了）</li>
+</ol>
+
+<p>そしてfillを実行<br>
+fillの引数は捨てて(waddle &#39;(b))から実行を再開します</p>
+
+<p>(waddle &#39;(b))はこうなります</p>
+
+<div><pre><code class="language-none">(let ()
+  (let/cc rest
+    (set! fill rest)
+    (leave &#39;b))
+  (waddle &#39;())))</code></pre></div>
+
+<p>fillにはこんな継続が設定されます</p>
+
+<ol>
+<li>fillの引数を(let/cc ...)の値とするけれども誰も見ていないので捨てる</li>
+<li>(waddle &#39;())から実行を再開する</li>
+<li>(waddle &#39;(b))は(waddle &#39;())の値を(start-it2 &#39;(a b))に返す</li>
+<li>(start-it2 &#39;(a b))はその値をREPLに返す（終了）</li>
+</ol>
+
+<p>そしてleaveです<br>
+さっき覚えた継続を実行しますので</p>
+
+<p>(let/cc ...)の値が&#39;aとなり、それがREPLに返されて終了です<br>
+合ってます</p>
+
+<p>最後の(get-next (quote go))を実行します</p>
+
+<div><pre><code class="language-none">(let/cc here-again
+  (set! leave here-again)
+  (fill (quote go)))</code></pre></div>
+
+<p>leaveは（略）</p>
+
+<p>そしてfillを実行<br>
+fillの引数は捨てて(waddle &#39;())から実行を再開します</p>
+
+<p>(waddle &#39;())はすぐに()を返します<br>
+すると2. 3. 4.を通ってstart-it2が()をREPLに()を返す、というわけですね<br>
+やっと納得できました</p>
+
+<p>もうちょっとコンパクトに書けないものかなあ</p>
+
+<p>で、()を返すなら何が問題なんでしょうか</p>
+
+<p>ファイルに</p>
+
+<div><pre><code class="language-none">(start-it2 &#39;(a b))
+(get-next (quote go))
+(get-next (quote go))</code></pre></div>
+
+<p>と書いて実行しても</p>
+
+<div><pre><code class="language-none">&#39;a
+&#39;b
+&#39;()</code></pre></div>
+
+<p>という結果が表示されるだけでした</p>
+
+<p>しかし、本当にstart-it2に戻っているのであれば、&#39;()を返した後<br>
+無限ループになってもよさそうなものです</p>
+
+<p>もしかして、ファイルに書いてあってもトップレベル（って言うんだっけ）まで<br>
+戻ったところで継続は止まってしまうのかな？<br>
+そうするとREPLと同じ<br>
+値が表示されるってことはそういうことかな<br>
+REPLに返すというよりトップレベルに返す、と書いたほうがよかったかもしれない</p>
+
+<p>というわけで無理やりletでくるんでみました</p>
+
+<div><pre><code class="language-none">&gt; (let ()
+    (start-it2 &#39;(a b))
+    (get-next (quote go))
+    (get-next (quote go)))
+ </code></pre></div>
+
+<p>固まってます！<br>
+もう少し様子がわかるようにしてみます</p>
+
+<div><pre><code class="language-none">&gt; (let ()
+    (display &quot;1 &quot;) (display (start-it2 &#39;(a b))) (newline)
+    (display &quot;2 &quot;) (display (get-next (quote go))) (newline)
+    (display &quot;3 &quot;) (display (get-next (quote go))) (newline))
+1 a
+2 b
+3 ()
+2 ()
+2 ()
+2 ()
+ :
+ :</code></pre></div>
+
+<p>letでくるんだことにより、fillの継続の最後が<br>
+「(start-it2 &#39;(a b))はその値をREPLに返す（終了）」だったところが<br>
+「(start-it2 &#39;(a b))の値を表示して次に(get-next ...)を評価する」に<br>
+なったというわけです</p>
+
+<p>get-nextは同じfillを実行し続けるので最後の部分を繰り返し実行し続ける、と<br>
+ふー</p>
+
+<p>やっと</p>
+
+<blockquote>
+<p>では、リストが完全に消費されたあとで(leave (quote ()))を使うと<br>
+うまくいきそうだ、というのは正しいですか。</p>
+</blockquote>
+
+<p>になるほど、とうなずくことができます</p>
+
+<p>最後にstart-it2に戻ってきたあとleaveを呼ぶと、最後のget-nextでsetした<br>
+leaveが実行されるので、start-it2ではなくget-nextが()を返して終わってくれます</p>
+
+<div><pre><code class="language-none">&gt; (let ()
+    (display &quot;1 &quot;) (display (get-first &#39;(a b))) (newline)
+    (display &quot;2 &quot;) (display (get-next (quote go))) (newline)
+    (display &quot;3 &quot;) (display (get-next (quote go))) (newline))
+1 a
+2 b
+3 ()
+
+&gt; </code></pre></div>
+
+<p>結局、ジェネレータみたいなものを作ってみたということ？<br>
+leaveがyield、fillがnextにあたりそう<br>
+（使ったことないのでいいかげんなこと言ってますけどたぶん）</p>
+
+<p>two-in-a-row*?の話はまたこんど</p>
+
+
+</body>
+
+</html>
