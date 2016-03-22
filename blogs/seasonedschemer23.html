@@ -1,0 +1,248 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer23</title>
+
+</head>
+<body>
+<h1 id="toc_0">Scheme修行 (23) テーブルとdefineとbox</h1>
+
+<p>ついにScheme修行も最終の第20章「店には何がある？」 <br>
+あいかわらずよく意味の分からないタイトルで締めてくれます</p>
+
+<p>第10章とおなじく、ここではschemeのインタプリタを作ります<br>
+今回はdefineが（letccも）実装されますのでそのままセルフで自分自身を実行することができるはず</p>
+
+<p>今回もなぜかテーブルの定義から入ります 好きですね<br>
+今回はリストではなく関数（というかクロージャ）でテーブルを作るそうです<br>
+関数でテーブルを作る利点は何でしょう？</p>
+
+<p>まずは空っぽのテーブルを作ります</p>
+
+<div><pre><code class="language-none">(define the-empty-table
+  (lambda (name)
+    (car (quote ()))))</code></pre></div>
+
+<p>↓のように書いてありますのでとりあえず版のようです</p>
+
+<blockquote>
+<p>「Scheme手習い」では次のようにしました。<br>
+<code>(car (quote ()))</code></p>
+</blockquote>
+
+<p>手習いの時はなんだろうこれと思ってたものですが<br>
+今回すっきり納得できるでしょうか<br>
+期待です</p>
+
+<p>検索と追加です</p>
+
+<div><pre><code class="language-none">(define lookup
+  (lambda (table name)
+    (table name)))
+
+(define extend
+  (lambda (name1 value table)
+    (lambda (name2)
+      (cond ((eq? name2 name1) value)
+            (else (table name2))))))</code></pre></div>
+
+<p>なるほどなんか動きそうですね<br>
+使い方はこんな感じになるでしょうか</p>
+
+<div><pre><code class="language-none">&gt; (define test-table the-empty-table)
+&gt; (set! test-table (extend &#39;name &#39;taro test-table))
+&gt; (set! test-table (extend &#39;nationality &#39;japan test-table))
+&gt; (lookup test-table &#39;name)
+&#39;taro
+&gt; (lookup test-table &#39;nationality)
+&#39;japan
+&gt; (lookup test-table &#39;gender)
+car: contract violation
+  expected: pair?
+  given: &#39;()</code></pre></div>
+
+<p>このとき、test-tableはこんな風に育っています<br>
+変数名がかぶるのでちょっとわかりづらいですが</p>
+
+<div><pre><code class="language-none">(lambda (name)
+  (car (quote ())))
+    ↓
+(lambda (name2)
+  (cond ((eq? name2 &#39;name) &#39;taro)
+        (else ((lambda (name)
+                 (car (quote ()))) name2))))
+    ↓
+(lambda (name2)
+  (cond ((eq? name2 &#39;nationality) &#39;japan)
+        (else ((lambda (name2)
+                 (cond ((eq? name2 &#39;name) &#39;taro)
+                       (else ((lambda (name)
+                                (car (quote ()))) name2)))) name2))))</code></pre></div>
+
+<p>確かに名前を与えると値を返す関数になっています</p>
+
+<p>ところで(lookup table e)が(table e)と同じ意味なんであればlookupて必要なんですかね<br>
+何かと形がそろってる必要があるのかな？<br>
+必要はないけどそろえたい？<br>
+あとで何か気付きがあるでしょうか</p>
+
+<p>テーブル作ったと思ったら今度は最上位のvalueを定義します ただし仮<br>
+ボトムアップだったりトップダウンだったり</p>
+
+<div><pre><code class="language-none">(define value
+  (lambda (e)
+    (cond ((define? e) (*define e))
+          (else (the-meaning e)))))</code></pre></div>
+
+<p>早速目玉機能であるdefineが現れました<br>
+完全に特別扱いです<br>
+the-meaningとやらの中では扱えないのかな？</p>
+
+<p>defineです<br>
+どんな高尚なことをするのかと思ったら</p>
+
+<div><pre><code class="language-none">(define *define
+  (lambda (e)
+    (set! global-table
+          (extend (name-of e)
+                  (box (the-meaning (right-side-of e)))
+                  global-table))))</code></pre></div>
+
+<p>覚えておくだけかよ！<br>
+なぜ特別扱いなんだろう<br>
+the-meaningを読んでるけれどもthe-meaningの中で扱えないことはない気がするんだけど</p>
+
+<p>覚えておく先はglobal-table決め打ちなんですね<br>
+ブロック構造なんかはこれでも実現できるんでしょうか<br>
+それとも実装しない？</p>
+
+<p>それよりboxってなんでしょうか<br>
+入れものっぽい雰囲気は醸しだしてますが</p>
+
+<blockquote>
+<p>*defineが名前と値でテーブルを拡張すると、その名前はいつも「同じ」値を<br>
+表すようになりますか。</p>
+
+<p>いいえ。前に何回か見たように、名前が表すものは(set! ...)を使って変更できます。</p>
+
+<p>*defineがテーブルを拡張する前に値をboxに入れるのは、それが理由ですか。</p>
+</blockquote>
+
+<p>それが理由らしいです<br>
+set!するためのしくみのようです</p>
+
+<p>boxを作り、値を設定し、値を取り出す関数です。</p>
+
+<div><pre><code class="language-none">(define box
+  (lambda (it)
+    (lambda (sel)
+      (sel it (lambda (new) (set! it new))))))
+
+(define setbox
+  (lambda (box new)
+    (box (lambda (it set) (set new)))))
+
+(define unbox
+  (lambda (box)
+    (box (lambda (it set) it))))</code></pre></div>
+
+<p>短いですけど複雑ですね<br>
+まずは使ってみましょうか</p>
+
+<div><pre><code class="language-none">&gt; (define testbox (box &#39;a))
+&gt; (unbox testbox)
+&#39;a
+&gt; (setbox testbox &#39;b)
+&gt; (unbox testbox)
+&#39;b</code></pre></div>
+
+<p>いつものように追いかけてみましょう<br>
+defineあたりはてきとうにごまかしつつ</p>
+
+<div><pre><code class="language-none">(define textbox (box &#39;a))
+(define testbox (lambda (sel) (sel &#39;a (lambda (new) (set!</code></pre></div>
+
+<p>あれ？<br>
+(set! it new)のitってどうなるの？<br>
+今までそこはただ名前が書いてあるものだと思ってたけど、変数だったらどうなるの？<br>
+(set! &#39;a new)じゃ変だし・・・</p>
+
+<p>そこはあくまでもitっていう名前で、変数じゃないってことかな？</p>
+
+<div><pre><code class="language-none">&gt; (let ((name &#39;aaa)) (define name &#39;bbb) name)
+&#39;bbb</code></pre></div>
+
+<p>そんな感じなのでとりあえずそういうことにしておいて進みます</p>
+
+<div><pre><code class="language-none">(define textbox (box &#39;a))
+(define testbox (lambda (sel) (sel &#39;a (lambda (new) (set! it new)))))
+
+(unbox testbox)
+(unbox (lambda (sel) (sel &#39;a (lambda (new) (set! it new)))))
+((lambda (sel) (sel &#39;a (lambda (new) (set! it new)))) (lambda (it set) it))
+((lambda (it set) it) &#39;a (lambda (new) (set! it new)))
+&#39;a</code></pre></div>
+
+<p>ふむふむよい感じ<br>
+続いてsetbox</p>
+
+<div><pre><code class="language-none">(setbox testbox &#39;b)
+(setbox (lambda (sel) (sel &#39;a (lambda (new) (set! it new)))) &#39;b)
+((lambda (sel) (sel &#39;a (lambda (new) (set! it new)))) (lambda (it set) (set &#39;b)))
+((lambda (it set) (set &#39;b)) &#39;a (lambda (new) (set! it new)))
+((lambda (new) (set! it new)) &#39;b)
+(set! it &#39;b)
+
+(unbox testbox)
+(unbox (lambda (sel) (sel &#39;a </code></pre></div>
+
+<p>・・・<br>
+aがaのままじゃ何にもなってないじゃないか<br>
+ということはどうなんだ<br>
+結局itはitのままということか<br>
+仮引数のitと、boxに入ったitを区別するためにbox内のitは&lt;it&gt;と書くことにして<br>
+最初からやってみよう</p>
+
+<div><pre><code class="language-none">(define textbox (box &#39;a))
+(define &lt;it&gt; &#39;a)
+(define testbox (lambda (sel) (sel &lt;it&gt; (lambda (new) (set! &lt;it&gt; new)))))
+
+(unbox testbox)
+((lambda (sel) (sel &lt;it&gt; (lambda (new) (set! &lt;it&gt; new)))) (lambda (it set) it))
+((lambda (it set) it) &lt;it&gt; (lambda (new) (set! &lt;it&gt; new)))
+&lt;it&gt;
+&#39;a
+
+(setbox testbox &#39;b)
+((lambda (sel) (sel &lt;it&gt; (lambda (new) (set! &lt;it&gt; new)))) (lambda (it set) (set &#39;b)))
+((lambda (it set) (set &#39;b)) &lt;it&gt; (lambda (new) (set! &lt;it&gt; new)))
+((lambda (new) (set! &lt;it&gt; new)) &#39;b)
+(set! &lt;it&gt; &#39;b)
+
+(unbox testbox)
+((lambda (sel) (sel &lt;it&gt; (lambda (new) (set! &lt;it&gt; new)))) (lambda (it set) it))
+((lambda (it set) it) &lt;it&gt; (lambda (new) (set! &lt;it&gt; new)))
+&lt;it&gt;
+&#39;b</code></pre></div>
+
+<p>defineの名前と、仮引数の名前、なんか違うものというイメージがありましたけど<br>
+おんなじってことですね<br>
+ぼんやりとは見えてきました</p>
+
+<p>ところでわざわざboxなんてものを使わなくても、直接set!してはいけないんでしょうか</p>
+
+<p>set!はdefineで定義した名前を指定するので、たとえば(a b)のbをcに<br>
+変更するってことができないから、ということかな<br>
+とうことは、名前の付いてない値を変更したい、でも名前がついてないとset!できない、<br>
+ということで隠れてこっそり名前をつけるのがboxということでしょうか<br>
+boxは、できないからしかたなく使うもので、本質的ではないと思ってもよいのでしょうか</p>
+
+<p>ここで「名前」とか「値」とか言っているものが本当は何者なのか<br>
+あとでもう一度振り返ってみる必要がありそうです<br>
+コードができあがればはっきりするはず</p>
+
+
+</body>
+
+</html>

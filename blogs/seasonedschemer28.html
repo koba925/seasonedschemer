@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="utf-8">
+<title>seasonedschemer28</title>
+
+
+
+</head>
+
+<body>
+
+<h1 id="toc_0">Scheme修行 (28) マクロ</h1>
+
+<blockquote>
+<p>ここまでやったからには簡単でいいからマクロとして実装してみたいですね</p>
+</blockquote>
+
+<p>scheme本来のマクロはけっこうややこしい感じだし原理を確認したいだけだから<br>
+うんと単純なやつで</p>
+
+<p>*letと*letrecをじっと見ると、eを変換してからmeaningにかければいいっぽい</p>
+
+<p>eを変換するのにもvalueのしくみ自身を使うわけですけど<br>
+今のママ(value &#39;(lambda ...) e)とやっても望みの結果は得られません<br>
+*applicationに似てるけど、引数をevlisせずそのまま渡して、返された値をもう一度<br>
+評価する関数がいるはず<br>
+こういう感じ</p>
+
+<div><pre><code class="language-none">(define *macro-application
+  (lambda (e table)
+    (meaning (expand e table) table)))
+(define expand
+  (lambda (e table)
+    ((meaning (function-of e) table)
+              (arguments-of e))))</code></pre></div>
+
+<p>関数をふたつに分けているのは、expandだけ呼んで正しくマクロが展開されているか<br>
+確認できるようにしたかっただけです</p>
+
+<p>・・・ということは<br>
+式を見て*applicationを呼ぶか*macro-applicationを呼ぶか見分けがつかないといけません<br>
+どうやって区別しよう？</p>
+
+<p>手習い式のクロージャだったらただのリストなのでnon-primitiveの代わりにmacroとか<br>
+書いてれば済んだんでしょうが今や本当のクロージャそのものだから・・・<br>
+うまい情報のもたせ方あるかなあ？</p>
+
+<p>kons式にセレクタを作って、関数なのかマクロなのかを返してくれるようにする手はあるな<br>
+*lambdaと*applicationも修正しないといけないけど</p>
+
+<p>と思って考えてみたけどあんまりいい感じじゃない</p>
+
+<p>あーあれか？<br>
+種類を持たせるなんてけちくさいことを言わず、*applicationそのものを<br>
+覚えさせておけばいいか？できるか？<br>
+これができればかっこいい気がする<br>
+Felleisen先生の意図どおりかもしれない？</p>
+
+<p>プリミティブなやつもこれに合わせないとなのか<br>
+a-primとかb-primとかに吸収できそうではあるけど<br>
+なんか大げさだなあ</p>
+
+<p>なんかもっとこじんまりしないかな<br>
+難しいことせずにマクロ用のテーブルを作って分けちゃうか<br>
+マクロの名前のほうが優先して検索されちゃうけどscheme的にはどうなんだろうな</p>
+
+<div><pre><code class="language-none">(define macro-table (lambda (name) #f))
+(define macro?
+  (lambda (e)
+    (lookup macro-table e)))</code></pre></div>
+
+<p>見つからなかったら継続とかすごいことせずに#fを返すようにしておきます<br>
+見つかればマクロ（に相当するlambda）を返すはずなので区別はつくはず</p>
+
+<p>マクロを定義するところ<br>
+構文は(defmacro &lt;マクロ名&gt; (lambda ...))と考えてます<br>
+マクロ定義に対してset!することはないことにしてboxは省略</p>
+
+<div><pre><code class="language-none">(define value
+  (lambda (e)
+    (let/cc the-end
+      (set! abort2 the-end)
+      (cond ((define? e) (*define e))
+            ((defmac? e) (*defmac e)) ; ここ追加
+            (else (the-meaning e))))))
+
+(define defmac?
+  (lambda (e)
+    (cond ((atom? e) #f)
+          ((atom? (car e)) (eq? (car e) (quote defmac)))
+          (else #f))))
+
+(define *defmac
+  (lambda (e)
+    (set! macro-table
+          (extend (name-of e)
+                  (the-meaning (right-side-of e))
+                  macro-table))))</code></pre></div>
+
+<p>式を見て関数かマクロか決めるところ</p>
+
+<div><pre><code class="language-none">(define list-to-action
+  (lambda (e)
+    (cond ((atom? (car e))
+           (cond ...
+                 ((macro? (car e)) *macro-application) ; ここ追加
+                 (else *application)))
+          (else *application))))</code></pre></div>
+
+<p>それから、*identifierは両方のテーブルを探すようにします</p>
+
+<div><pre><code class="language-none">(define *identifier
+  (lambda (e table)
+    (let ((m (lookup macro-table e)))
+      (cond ((eq? m #f) (unbox (lookup table e)))
+            (else m)))))</code></pre></div>
+
+<p>できたぽいです<br>
+まずは簡単なやつで試してみます</p>
+
+<div><pre><code class="language-none">&gt; (value &#39;(defmac set1
+            (lambda (name)
+              (cons (quote set!)
+                    (cons name
+                          (cons 1 (quote ())))))))
+&gt; (expand &#39;(set1 a) lookup-in-global-table)
+&#39;(set! a 1)
+&gt; (value &#39;(define a 0))
+&gt; (value &#39;a)
+0
+&gt; (value &#39;(set1 a))
+&gt; (value &#39;a)
+1</code></pre></div>
+
+<p>できました<br>
+ほんとはそんなにすんなりできたわけじゃありません</p>
+
+<p>ではletやってみます</p>
+
+<p>・・・</p>
+
+<p>letって引数が可変長じゃないか<br>
+まあ可変長受け取れるように作ればいいんだけど<br>
+可変長なところはカッコでくくることにしちゃおう<br>
+束縛するところはカッコでくくるんだから本体をカッコでくくっちゃだめという法はない（開き直り<br>
+書く気になれば書けると思うから！</p>
+
+<div><pre><code class="language-none">(value &#39;(define let-formals-of
+          (lambda (binds)
+            (cond ((null? binds) (quote ()))
+                  (else (cons (car (car binds))
+                              (let-formals-of (cdr binds))))))))
+(value &#39;(define let-args-of
+          (lambda (binds)
+            (cond ((null? binds) (quote ()))
+                  (else (cons (car (cdr (car binds)))
+                              (let-args-of (cdr binds))))))))
+(value &#39;(defmac my-let
+          (lambda (binds body)
+            (cons (cons (quote lambda)
+                        (cons (let-formals-of binds) body))
+                  (let-args-of binds)))))</code></pre></div>
+
+<p>まずは正しく展開されるか確かめてみよう</p>
+
+<div><pre><code class="language-none">&gt; (expand &#39;(my-let
+             ((x (quote a))
+              (y (cons (quote b) (quote ()))))
+             ((cons x y))) ; ここのカッコがひとつ多い
+          lookup-in-global-table)
+&#39;((lambda (x y) (cons x y)) &#39;a (cons &#39;b &#39;()))</code></pre></div>
+
+<p>OK<br>
+では実行</p>
+
+<div><pre><code class="language-none">&gt; (value &#39;(my-let
+            ((x (quote a))
+             (y (cons (quote b) (quote ()))))
+            ((cons x y))))
+&#39;(a b)</code></pre></div>
+
+<p>おｋ<br>
+ふー終わり終わり<br>
+letrecは新しいシンボル作るところがめんどっちいからパス</p>
+
+<p>あ、でも「普通の」defineも書けるようにしてみたかったんだった<br>
+(define (add2 x) (add1 (add1 x)))みたいに書くやつね<br>
+本体に複数の関数を書けるようにはしないよ！</p>
+
+<div><pre><code class="language-none">&gt; (value &#39;(defmac my-define
+            (lambda (form body)
+              (cons &#39;define
+                    (cons (car form)
+                          (cons (cons &#39;lambda
+                                      (cons (cdr form)
+                                            (cons body (quote ()))))
+                                (quote ())))))))
+&gt; (expand &#39;(my-define (add2 x) (add1 (add1 x))) lookup-in-global-table)
+&#39;(define add2 (lambda (x) (add1 (add1 x))))</code></pre></div>
+
+<p>よしよし<br>
+では</p>
+
+<div><pre><code class="language-none">&gt; (value &#39;(my-define (add2 x) (add1 (add1 x))))
+&#39;(no-answer define)</code></pre></div>
+
+<p>あり？</p>
+
+<p>ああ、meaningにはdefineないもんね<br>
+マクロで変換するところはvalueを呼ぶほうがよかったのかな？<br>
+つまりこう？</p>
+
+<div><pre><code class="language-none">(define *macro-application
+  (lambda (e table)
+    (value (expand e table))))</code></pre></div>
+
+<p>add2は動いた</p>
+
+<div><pre><code class="language-none">&gt; (value &#39;(my-define (add2 x) (add1 (add1 x))))
+&gt; (value &#39;(add2 1))
+3</code></pre></div>
+
+<p>けどこれじゃ変換後の式の評価でtableに入ってる環境が使われないからおかしくない？<br>
+なんか沼にはまってる？</p>
+
+<p>どんなときにおかしくなるかな<br>
+マクロ内で自由変数を参照してる時とかか</p>
+
+<div><pre><code class="language-none">&gt; (value &#39;(my-let ((x (quote a)))
+                  ((my-let ((y (cons (quote b) (quote ()))))
+                            ((cons x y))))))
+&#39;(no-answer x)</code></pre></div>
+
+<p>ほらね<br>
+じゃねーよ</p>
+
+<p>tableで環境を引き継がなきゃいけないとすると、*macro-applicationは元に戻すとして、<br>
+valueじゃなくてmeaningでdefineを扱えるようにする必要がある<br>
+これはまあやるだけっちゃあやるだけでできそうなんだけど<br>
+なぜdefineをvalueに置いておいたかっていうのが問題だ</p>
+
+<p>とりあえずやるだけっていうのはこういうこと</p>
+
+<div><pre><code class="language-none">(define value
+  (lambda (e)
+    (let/cc the-end
+      (set! abort2 the-end)
+      (the-meaning e))))
+
+(define meaning
+  (lambda (e table)
+    (cond ((define? e) (*define e)) ; ここへ移動
+          ((defmac? e) (*defmac e)) ; これも
+          (else ((expression-to-action e) e table)))))</code></pre></div>
+
+<p>これでmy-defineもさっきのmy-letも両方動く<br>
+しかし意味もなくdefineをvalueで扱うようになっていたはずもない</p>
+
+<p>valueで扱うようにしたということは、(value &#39;(define ...))の形しか許さないということ<br>
+meaningでdefineを扱うようにしてしまうと式の途中のdefineまで処理しようとしてしまう</p>
+
+<p>それで何がまずいのかというと<br>
+こんな感じで一見局所的な名前が定義できたように見えても</p>
+
+<div><pre><code class="language-none">&gt; (value &#39;((lambda (x)
+             (define temp 3)
+             (eq? temp x))
+           4))
+#f</code></pre></div>
+
+<p>実は局所的じゃなかったとか</p>
+
+<div><pre><code class="language-none">&gt; (value &#39;temp)
+3</code></pre></div>
+
+<p>そんなことかな<br>
+scheme準拠ならこういうこともできなきゃいけないはずなんだけど<br>
+これをなんとかするのはちょっと大変そうだ<br>
+冷静に考えるとmy-defineをあきらめるくらいが相場？<br>
+今回はこれで終わりにしておこう</p>
+
+<p>またいつか</p>
+
+
+
+
+</body>
+
+</html>

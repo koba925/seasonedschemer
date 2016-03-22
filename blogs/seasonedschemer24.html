@@ -1,0 +1,192 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer24</title>
+
+</head>
+<body>
+<h1 id="toc_0">Scheme修行 (24) quote、identifier、set</h1>
+
+<p>the-meaningです</p>
+
+<div><pre><code class="language-none">(define the-meaning
+  (lambda (e)
+    (meaning e lookup-in-global-table)))
+
+(define lookup-in-global-table
+  (lambda (name)
+    (lookup global-table name)))</code></pre></div>
+
+<p>global-tableにおけるmeaningは特別ということでtheがついてるんでしょうね</p>
+
+<blockquote>
+<p>lookup-in-global-tableはテーブルと同じようなものというのは正しいですか。<br>
+はい。名前を引数として取り、その名前と組になっている値をglobal-tableの中で<br>
+探します。</p>
+</blockquote>
+
+<p>何を言いたいのかわかるようなわからないような感じですが<br>
+言ってることはそのとおりです</p>
+
+<blockquote>
+<p>つまり、lookup-in-global-tableはglobal-tableのようなものということですか。<br>
+はいでもあり、いいえでもあります。<br>
+*defineはglobal-tableを変更するので、lookup-in-global-tableは常に<br>
+最新のglobal-tableと同じようなものですが、現在のglobal-tableと同じ<br>
+ようなものではありません。</p>
+</blockquote>
+
+<p>てどういうことですかね<br>
+lookup-in-global-tableが現在のglobal-tableを探してくれないなんてことあるんでしょうか</p>
+
+<p>・・・</p>
+
+<p>直接global-tableって書いちゃうと、書いた時点のglobal-tableが<br>
+使われてしまって、あとでset!とかした内容が反映されないってことか<br>
+lookup-in-global-tableにすることで、実際に中身が必要になるまでテーブルの評価を<br>
+遅延させてる働きがあるんですね<br>
+Yでやったアレと同じ</p>
+
+<blockquote>
+<p>これを前に見たことがありますか？<br>
+16章のY!を思い出していますか？</p>
+</blockquote>
+
+<p>いったんletで変数に割り当てた関数を変更してから呼ぶとき、<br>
+変更前の関数が呼ばれるのか変更後の関数が呼ばれるのかどっちなんだと思ってましたね<br>
+話の流れ上、変更後の関数が呼ばれるに違いないということで進みましたが<br>
+やはりそういうことだったぽいです</p>
+
+<p>次はtheのないmeaning<br>
+こんどはtableを引数に取ります</p>
+
+<div><pre><code class="language-none">(define meaning
+  (lambda (e table)
+    ((expression-to-action e) e table)))</code></pre></div>
+
+<p>「(expression-to-action e) e」てあたり、なんか回りくどくないですか<br>
+(action e table)みたいに作れないのかな<br>
+どっちみちeはactionに渡されるんだし</p>
+
+<p>それだとactionが巨大なcondになってしまうからそれを避けてるんでしょうね<br>
+ポリモーフィズムみたいなものですね<br>
+ていうかこっちのほうがポリモーフィズムの元かな</p>
+
+<p>ひとつ「action」を作ってみます</p>
+
+<div><pre><code class="language-none">(define *quote
+  (lambda (e table)
+    (text-of e)))</code></pre></div>
+
+<p>なんとなく通して実行できそうな部品が揃ってきました<br>
+ちょっとずつ動かしながら進みたいので、フライングして後ろの方に出てくる<br>
+text-ofとかexpression-to-actionあたりの関数を入れておきます<br>
+全部入れるとまたあれもこれも入れないと動かないので余計なところはコメントアウトしたり</p>
+
+<div><pre><code class="language-none">&gt; (value &#39;(quote a))
+&#39;a</code></pre></div>
+
+<p>quoteだけ評価できるインタプリタの完成です</p>
+
+<div><pre><code class="language-none">(value &#39;(quote a))
+(the-meaning &#39;(quote a))
+(meaning &#39;(quote a) lookup-in-global-table)
+((expression-to-action &#39;(quote a)) &#39;(quote a) lookup-in-global-table)
+(*quote &#39;(quote a) lookup-in-global-table)
+(text-of &#39;(quote a))
+&#39;a</code></pre></div>
+
+<p>というわけです<br>
+actionが変わってもこのへんの流れは同じようなものだと思われます</p>
+
+<p>次は*identifer<br>
+テーブルから探してくるだけですが値はboxに入っているのでunboxする必要があります</p>
+
+<div><pre><code class="language-none">(define *identifier
+  (lambda (e table)
+    (unbox (lookup table e))))</code></pre></div>
+
+<p>ええとこれは試す方法あるかな<br>
+テーブルに何か入っている必要がありますけど</p>
+
+<p>ああ、今回はdefineがありますね<br>
+手習いの時は結局lambdaまで実装しないとテーブルに何も入らなくて<br>
+けっこう試しづらかった記憶が</p>
+
+<div><pre><code class="language-none">&gt; (value &#39;(define a (quote aaa)))
+&gt; (value &#39;a)
+&#39;aaa</code></pre></div>
+
+<p>いけてるようです</p>
+
+<p>続いてset!<br>
+目玉機能ですけどカンタン<br>
+ほとんどidentifierと同じ</p>
+
+<div><pre><code class="language-none">(define *set
+  (lambda (e table)
+    (setbox (lookup table (name-of e))
+            (meaning (right-side-of e) table))))</code></pre></div>
+
+<p>動きます</p>
+
+<div><pre><code class="language-none">(上の続き)
+&gt; (value &#39;(set! a (quote bbb)))
+&gt; (value &#39;a)
+&#39;bbb</code></pre></div>
+
+<p>動きはひとまとめにして追ってみます<br>
+defineとかset!とかが出てくると式だけ並べてもわかりません<br>
+boxとかテーブルのように式に式にかけないところの表現がなやましい<br>
+まあやってみます</p>
+
+<div><pre><code class="language-none">global-table -&gt; 空
+
+(value &#39;(define a (quote aaa)))
+(*define &#39;(define a (quote aaa)))
+(set! global-table
+  (extend (name-of &#39;(define a (quote aaa)))
+          (box (the-meaning (right-side-of &#39;(define a (quote aaa)))))
+          global-table))
+(set! global-table (extend &#39;a &#39;aaa global-table))
+
+global-table -&gt; | a | &#39;aaa |
+
+(value &#39;(set! a (quote bbb)))
+(the-meaning &#39;(set! a (quote bbb)))
+(meaning  &#39;(set! a (quote bbb)) lookup-in-global-table)
+((expression-to-action &#39;(set! a (quote bbb)))
+ &#39;(set! a (quote bbb)) lookup-in-global-table))
+(*set &#39;(set! a (quote bbb)) lookup-in-global-table)
+(setbox (lookup lookup-in-global-table &#39;a)
+        (meaning &#39;(quote bbb) lookup-in-global-table))
+(setbox &lt;aの指すbox&gt; &#39;bbb)
+
+global-table -&gt; | a | &#39;bbb |
+
+(value &#39;a)
+(the-meaning &#39;a)
+(meaning &#39;a lookup-in-global-table)
+((expression-to-action &#39;a) &#39;a lookup-in-global-table)
+(*identifier &#39;a lookup-in-global-table)
+(unbox (lookup lookup-in-global-table &#39;a))
+(unbox &lt;aの指すbox&gt;)
+&#39;bbb</code></pre></div>
+
+<p>てな感じです</p>
+
+<p>set!はそのときのテーブルで、defineは常にglobal-tableで右辺を評価するところが違いますね<br>
+このへんがdefineを特別扱いする理由ぽい気がしてきました<br>
+the-meaning以下で呼ばれるとそのときのテーブルで評価されてしまいますので<br>
+（global-tableはグローバルなので使いたければいつでも使えますが自然に書けば）</p>
+
+<p>defineが渡されたテーブル内で右辺を記録するようになっていたらどうなるでしょう<br>
+defineのあるスコープの範囲内でしか関数が呼び出せなくなってしまいますね<br>
+それはそれで使いみちがありそうな感じではありますが<br>
+手習いのvalueにdefineモドキをつけようとしたときそのへんで苦労したような気もします</p>
+
+
+</body>
+
+</html>

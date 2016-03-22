@@ -1,0 +1,186 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<title>seasonedschemer26</title>
+
+</head>
+<body>
+<h1 id="toc_0">Scheme修行 (26) let/cc、残り、セルフ</h1>
+
+<p>先回りして書いてた*constについてはちょっとだけ<br>
+最初の *constの定義はこう</p>
+
+<div><pre><code class="language-none">(define a-prim
+  (lambda (p)
+    (lambda (args-in-a-list)
+      (p (car args-in-a-list)))))
+(define b-prim
+  (lambda (p)
+    (lambda (args-in-a-list)
+      (p (car args-in-a-list)
+         (car (cdr args-in-a-list))))))
+
+(define *const
+  (lambda (e table)
+    (cond ...
+          ((eq? e (quote cons)) (b-prim cons))
+          ((eq? e (quote car)) (a-prim car))
+          ...)))</code></pre></div>
+
+<p>これでも動くんですが、carとかconsを評価するたびに(b-prim cons)や<br>
+(a-prim car)を評価することになります</p>
+
+<p>こう書きなおしておけば</p>
+
+<div><pre><code class="language-none">(define *const
+  (let ((:cons (b-prim cons))
+        (:car (a-prim cons)))
+    (lambda (e table)
+      (cond ...
+            ((eq? e (quote cons)) :cons)
+            ((eq? e (quote car)) :car)
+            ...))))</code></pre></div>
+
+<p>(b-prim cons)や(a-prim car)を評価するのは<br>
+defineのときの1回だけで済みます<br>
+letがlambdaの外側にあることが大事です<br>
+letが先に評価されるので、:consや:carを含むクロージャができます<br>
+letがlambdaの中にあると、lambdaを評価するたびに:consや:carを<br>
+全部作るのでかえって非効率になります</p>
+
+<blockquote>
+<p>第15の戒律（最終版）<br>
+関数定義において繰り返される式は、当の関数を1回使用するときに2回評価される<br>
+可能性があるなら、それらの値を名づくるに(let ...)を用うべし。また、関数が<br>
+用いられるごとに再評価される(set!のない)式の値には、(let ...)を用いて<br>
+名づくるべし。</p>
+</blockquote>
+
+<p>順番が逆になりましたが<br>
+a-primやb-primは、普通の関数を、*application向けに変換するものです<br>
+普通の関数は(f &#39;a &#39;b &#39;c)のように引数を取りますが<br>
+*appliationには(f (&#39;a &#39;b &#39;c))のように引数をリストにして渡す必要があるためです</p>
+
+<p>condはほぼ手習いの時と同じなので省略して*letccです</p>
+
+<div><pre><code class="language-none">(define *letcc
+  (lambda (e table)
+    (let/cc skip
+      (beglis (ccbody-of e)
+              (extend (name-of e)
+                      (box (a-prim skip))
+                      table)))))</code></pre></div>
+
+<p>*lambdaと似てますね<br>
+*lambdaでは引数の名前と値（のbox）を組みにしていましたが<br>
+こちらでは継続の名前と継続を組にしています<br>
+a-primしているのはリストに入った引数をskipに渡すため<br>
+あとで(e &#39;(result))としてやるとあたかもlet/ccがresultを返したかのように<br>
+動作を継続します</p>
+
+<p>処理してるコードの中のlet/ccと、インタプリタの処理をlet/ccするのが<br>
+本当に一致するのかというとちょっと心配です<br>
+雰囲気的に動いてくれそうな感じではあるんですが</p>
+
+<div><pre><code class="language-none">&gt; (value &#39;(let/cc hop 1))
+1
+&gt; (value &#39;(let/cc hop (hop 1) 2))
+1</code></pre></div>
+
+<p>動いてはいますね<br>
+こんなのうまく追いかけられるかな</p>
+
+<div><pre><code class="language-none">(value &#39;(let/cc hop (hop 1) 2))
+(the-meaning &#39;(let/cc hop (hop 1) 2))
+(meaning &#39;(let/cc hop (hop 1) 2) lookup-in-global-table)
+(*letcc &#39;(let/cc hop (hop 1) 2) lookup-in-global-table)
+
+(let/cc skip (beglis &#39;((hop 1) 2)
+                     (extend &#39;hop &lt;skipの入ったbox&gt; lookup-in-global-table)))
+skip &lt;- （REPLに値を返すだけの）継続
+(beglis &#39;((hop 1) 2) (extend &#39;hop &lt;skipの入ったbox&gt; lookup-in-global-table))
+global-table -&gt; | hop | &lt;skipの入ったbox&gt; |
+((lambda (val) (beglis &#39;(2) lookup-in-global-table))
+   (meaning &#39;(hop 1) lookup-in-global-table))
+※以下(lambda(val) ...)は省略
+(*application &#39;(hop 1) lookup-in-global-table)
+(*application &#39;(hop 1) lookup-in-global-table)
+((meaning &#39;hop lookup-in-global-table) (evlis &#39;(1) lookup-in-global-table))
+((*identifier &#39;hop lookup-in-global-table) &#39;(1))
+((unbox &lt;skipの入ったbox&gt;) &#39;(1))
+((a-prim skip) &#39;(1))
+(skip 1)
+1</code></pre></div>
+
+<p>ちょっと例が簡単すぎたかな・・・<br>
+でも続きを実行してくれそうな気がしてきたぞ<br>
+「(REPLに値を返すだけの)」が「回りの式に値を返す」になるだけだもんね？</p>
+
+<div><pre><code class="language-none">(value &#39;(zero? (let/cc hop (hop 1) 2)))</code></pre></div>
+
+<p>だったら、えーと<br>
+これはイメージトレーングだけにとどめよう<br>
+<code>(hop 1)</code>を評価すると<code>(meaning &#39;(let/cc hop (hop 1) 2))</code>の値が1になって<br>
+引き続き<code>(zero? 1)</code>を評価する感じになるはずだ<br>
+大丈夫だ</p>
+
+<p>最後の仕上げです<br>
+the-empty-tableが半端なままです<br>
+こうなります<br>
+abort2は脱出用の継続です</p>
+
+<div><pre><code class="language-none">(define the-empty-table
+  (lambda (name)
+    (abort2 (cons (quote no-answer) (cons name (quote ()))))))</code></pre></div>
+
+<p>そこに処理を書くのか<br>
+なんかすごいな<br>
+ほとんどそこにしか書くところはないけど</p>
+
+<p>このthe-empty-tableが使えるよう、valueに手を加えます</p>
+
+<div><pre><code class="language-none">(define value
+  (lambda (e)
+    (let/cc the-end
+      (set! abort2 the-end)
+      (cond ((define? e) (*define e))
+            (else (the-meaning e))))))</code></pre></div>
+
+<div><pre><code class="language-none">&gt; (the-empty-table &#39;z)
+&#39;(no-answer z)
+&gt; (value &#39;z)
+&#39;(no-answer z)</code></pre></div>
+
+<p>ちゃんと例外的な状況も処理できるようになりましたよと</p>
+
+<p>さてこれでdefineもできるvalueができました<br>
+ということは、自分自身を実行することもできるはず</p>
+
+<p>こんな感じで、すべての関数をvalueの中で改めて定義してやります</p>
+
+<div><pre><code class="language-none">(value &#39;(define value
+          (lambda (e)
+            (let/cc the-end
+              (set! abort2 the-end)
+              (cond ((define? e) (*define e))
+                    (else (the-meaning e)))))))</code></pre></div>
+
+<p>もはやglobal-tableがどんなクロージャになっているのか想像するのも困難なレベル</p>
+
+<p>動くかな・・・</p>
+
+<div><pre><code class="language-none">&gt; (value &#39;(value (quote
+                  (define length
+                    (lambda (lat)
+                      (cond ((null? lat) 0)
+                            (else (add1 (length (cdr lat))))))))))
+&gt; (value &#39;(value (quote (length (quote (a b c))))))
+3</code></pre></div>
+
+<p>動いたー！</p>
+
+
+</body>
+
+</html>
